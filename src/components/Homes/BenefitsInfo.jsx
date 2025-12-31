@@ -183,7 +183,19 @@ export const BenefitsInfo = () => {
               boxShadow: "0px 25px 50px -12px rgba(0, 0, 0, 0.25)",
               backgroundColor: "transparent",
             }}
-          />
+          >
+             <Box
+                component="img"
+                src="https://www.lechodesarenes.com/wp-content/uploads/2021/04/Du-bon-usage-du-numerique_article_full.jpg"
+                alt="Preview"
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  display: "block",
+                }}
+              />
+          </Box>
 
           <Box
             sx={{

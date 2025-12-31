@@ -4,7 +4,7 @@ import { BenefitsInfo } from "../../components/Homes/BenefitsInfo";
 import { FeatureCard } from "../../components/Homes/FeatureCard";
 import { FeatureGrid } from "../../components/Homes/FeatureGrid";
 import { FeatureOverview } from "../../components/Homes/FeatureOverview";
-import { HeroIntro } from "../../components/Homes/HeroIntro";
+import { HeadBar } from "../../components/Homes/HeroIntro";
 import { ThemeProvider } from "../../theme";
 
 const NaviHealth = () => {
@@ -18,8 +18,8 @@ const NaviHealth = () => {
         position: "relative",
       }}
     >
+      <HeadBar />
       <FeatureOverview />
-      <HeroIntro />
       <FeatureGrid />
       <BenefitsInfo />
       <FeatureCard />

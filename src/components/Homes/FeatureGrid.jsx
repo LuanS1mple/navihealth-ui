@@ -1,6 +1,7 @@
 import BarChartIcon from "@mui/icons-material/BarChart";
 import EventIcon from "@mui/icons-material/Event";
 import FolderOpenIcon from "@mui/icons-material/FolderOpen";
+import DescriptionIcon from '@mui/icons-material/Description';
 import LockIcon from "@mui/icons-material/Lock";
 import MonitorHeartIcon from "@mui/icons-material/MonitorHeart";
 import PsychologyIcon from "@mui/icons-material/Psychology";
@@ -11,7 +12,7 @@ import { Box, Button, Chip, Grid, Stack, Typography } from "@mui/material";
 const featureData = [
   {
     id: 1,
-    icon: <FolderOpenIcon sx={{ fontSize: 48, color: "#004aad" }} />,
+    icon: <DescriptionIcon sx={{ fontSize: 48, color: "#004aad" }} />,
     title: "Quản lý hồ sơ sức khỏe",
     description:
       "Lưu trữ và quản lý toàn bộ hồ sơ bệnh án, kết quả xét nghiệm của bạn một cách an toàn",
@@ -88,15 +89,14 @@ const FeatureCard = ({ feature }) => {
         height: "202px",
       }}
     >
-      <Stack spacing="22px" sx={{ p: "24px" }}>
+      <Stack spacing="22px" sx={{ p: 3, width: 'calc(100vw / 5 - 6px)' }}>
         <Box
           sx={{
-            width: 48,
-            height: 48,
+            width: 40,
+            height: 40,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            backgroundColor: feature.iconBgColor,
             borderRadius: "14px",
           }}
         >
@@ -121,12 +121,13 @@ const FeatureCard = ({ feature }) => {
           position: "absolute",
           top: "136px",
           left: "26px",
-          width: "359px",
+          width: "90%",
           fontFamily: "'Arimo-Regular', Helvetica",
           fontWeight: 400,
           color: feature.isLocked ? "#99a1ae" : "#495565",
           fontSize: "14px",
           lineHeight: "20px",
+          overflowX: 'hidden'
         }}
       >
         {feature.description}
@@ -266,33 +267,6 @@ export const FeatureGrid = () => {
             }}
           />
 
-          <Stack spacing={0} alignItems="center">
-            <Typography
-              sx={{
-                fontFamily: "'Arimo-Regular', Helvetica",
-                fontWeight: 400,
-                color: "#004aad",
-                fontSize: "16px",
-                lineHeight: "24px",
-                textAlign: "center",
-              }}
-            >
-              Mọi thứ bạn cần để
-            </Typography>
-            <Typography
-              sx={{
-                fontFamily: "'Arimo-Regular', Helvetica",
-                fontWeight: 400,
-                color: "#004aad",
-                fontSize: "16px",
-                lineHeight: "24px",
-                textAlign: "center",
-              }}
-            >
-              chăm sóc sức khỏe
-            </Typography>
-          </Stack>
-
           <Typography
             sx={{
               fontFamily: "'Arimo-Regular', Helvetica",
@@ -301,7 +275,7 @@ export const FeatureGrid = () => {
               fontSize: "16px",
               lineHeight: "24px",
               textAlign: "center",
-              maxWidth: "672px",
+              maxWidth: "px",
             }}
           >
             Đăng nhập để mở khóa toàn bộ tính năng và trải nghiệm hệ thống quản

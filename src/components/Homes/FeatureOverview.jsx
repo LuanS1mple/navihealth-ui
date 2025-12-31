@@ -28,16 +28,15 @@ export const FeatureOverview = () => {
         width: "100%",
         display: "flex",
         justifyContent: "center",
-        mt: "65px",
       }}
     >
       <Stack
         spacing={6}
         sx={{
-          maxWidth: "768px",
+          maxWidth: "800px",
           width: "100%",
           alignItems: "center",
-          mt: 10,
+          mt: 2,
         }}
       >
         <Box
@@ -79,7 +78,7 @@ export const FeatureOverview = () => {
               fontFamily: "Arimo-Regular, Helvetica",
               fontWeight: 400,
               color: "#004aad",
-              fontSize: "16px",
+              fontSize: "24px",
               lineHeight: "24px",
               letterSpacing: "0",
               textAlign: "center",

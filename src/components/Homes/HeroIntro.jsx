@@ -2,7 +2,7 @@ import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
 import PersonOutline from "@mui/icons-material/PersonOutline";
 import { Box, Button, Stack, Typography } from "@mui/material";
 
-export const HeroIntro = () => {
+export const HeadBar = () => {
   return (
     <Box
       component="header"
@@ -19,7 +19,7 @@ export const HeroIntro = () => {
         direction="row"
         alignItems="center"
         justifyContent="space-between"
-        sx={{ height: "64px" }}
+        sx={{ height: "70px" }}
       >
         <Stack direction="row" alignItems="center" spacing={1.5}>
           <Box
@@ -48,7 +48,7 @@ export const HeroIntro = () => {
               fontFamily: "'Arimo-Bold', Helvetica",
               fontWeight: 700,
               color: "#004aad",
-              fontSize: "24px",
+              fontSize: "30px",
               lineHeight: "36px",
               letterSpacing: "0",
               whiteSpace: "nowrap",
@@ -83,7 +83,7 @@ export const HeroIntro = () => {
                 fontFamily: "'Arimo-Regular', Helvetica",
                 fontWeight: 400,
                 color: "#495565",
-                fontSize: "14px",
+                fontSize: "16px",
                 letterSpacing: "0",
                 lineHeight: "20px",
                 whiteSpace: "nowrap",
@@ -109,7 +109,7 @@ export const HeroIntro = () => {
                 fontFamily: "'Arimo-Regular', Helvetica",
                 fontWeight: 400,
                 color: "#519db1",
-                fontSize: "14px",
+                fontSize: "16px",
                 letterSpacing: "0",
                 lineHeight: "20px",
                 whiteSpace: "nowrap",
@@ -137,7 +137,7 @@ export const HeroIntro = () => {
                 fontFamily: "'Arimo-Regular', Helvetica",
                 fontWeight: 400,
                 color: "white",
-                fontSize: "14px",
+                fontSize: "16px",
                 letterSpacing: "0",
                 lineHeight: "20px",
                 whiteSpace: "nowrap",
@@ -152,4 +152,4 @@ export const HeroIntro = () => {
   );
 };
 
-export default HeroIntro;
+export default HeadBar;
