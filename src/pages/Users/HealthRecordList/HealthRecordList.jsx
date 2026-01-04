@@ -148,7 +148,74 @@ function HealthRecordList() {
               </Grid>
             </Box>
             {/* tìm kiếm */}
+                        <Card
+                sx={{
+                  borderRadius: 4,
+                  border: '1px solid rgba(134,203,222,0.3)',
+                  boxShadow: 'none',
+                  mb: 2,
+                  width: '90%'
+                }}
+            >
+              <CardContent  sx={{ p: 2 }}>
+                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center'}}>
+                  <TextField
+                      fullWidth
+                      placeholder="Tìm kiếm nhắc nhở..."
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Search size={16} color="#99A1AF" />
+                          </InputAdornment>
+                        ),
+                      }}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          bgcolor: '#f3f3f5',
+                          borderRadius: 3,
+                          '& fieldset': {
+                            borderColor: 'rgba(134,203,222,0.3)',
+                          },
+                        },
+                      }}
+                  />
+                    
+                  <FormControl sx={{ minWidth: 180 }}>
+                    <Select
+                        sx={{
+                          bgcolor: '#f3f3f5',
+                          borderRadius: 3,
+                          '& fieldset': {
+                            borderColor: 'rgba(134,203,222,0.3)',
+                          },
+                        }}
+                      >
+                      <MenuItem value="all">Tất cả loại</MenuItem>
+                      <MenuItem value="medicine">Uống thuốc</MenuItem>
+                      <MenuItem value="checkup">Tái khám</MenuItem>
+                      <MenuItem value="measurement">Đo chỉ số</MenuItem>
+                      <MenuItem value="exercise">Tập luyện</MenuItem>
+                    </Select>
+                    </FormControl>
 
+                    <FormControl sx={{ minWidth: 104 }}>
+                      <Select
+                        sx={{
+                          bgcolor: '#f3f3f5',
+                          borderRadius: 3,
+                          '& fieldset': {
+                            borderColor: 'rgba(134,203,222,0.3)',
+                          },
+                        }}
+                      >
+                        <MenuItem value="all">Tất cả</MenuItem>
+                        <MenuItem value="active">Đang hoạt động</MenuItem>
+                        <MenuItem value="inactive">Tạm dừng</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Box>
+                </CardContent>
+              </Card>                  
             {/* bản ghi */}
             {records.map((record) => (
                 <HealthRecord
