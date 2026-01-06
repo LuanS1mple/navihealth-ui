@@ -9,6 +9,8 @@ import HealthRecord from "./components/HealthRecord/HealthRecord"
 import HealthRecordList from "./pages/Users/HealthRecordList/HealthRecordList"
 import ChatBot from "./pages/Users/ChatBot/ChatBot"
 import ReminderList from "./pages/Users/ReminderList/ReminderList"
+import SideBarAdmin from "./pages/Admins/SideBar/SideBarAdmin"
+import MainScreen from "./pages/Admins/MainScreen/MainScreen"
 function App() {
   return (
     <>
@@ -18,7 +20,8 @@ function App() {
       {/* <Main/> */}
       {/* <HealthRecordList/> */}
       {/* <ChatBot/> */}
-      <ReminderList/>
+      {/* <ReminderList/> */}
+      <MainScreen/>
     </>
   )
 }
