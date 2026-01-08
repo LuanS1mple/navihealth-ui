@@ -9,7 +9,6 @@ function Account({dimension}) {
       <Box
       sx={{
         width: sideBarWidth,
-        p: 2,
         borderRadius: 3,
         boxShadow: "0 4px 14px rgba(0,0,0,0.08)",
         display: "flex",

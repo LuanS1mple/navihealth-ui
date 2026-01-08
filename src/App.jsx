@@ -12,6 +12,7 @@ import ReminderList from "./pages/Users/ReminderList/ReminderList"
 import SideBarAdmin from "./pages/Admins/SideBar/SideBarAdmin"
 import MainScreen from "./pages/Admins/MainScreen/MainScreen"
 import UserManagement from "./pages/Admins/UserManagement/UserManagement"
+import DashBoard from "./pages/Admins/DasbBoard/DashBoard"
 function App() {
   return (
     <>
@@ -23,7 +24,8 @@ function App() {
       {/* <ChatBot/> */}
       {/* <ReminderList/> */}
       {/* <MainScreen/> */}
-      <UserManagement/>
+      {/* <UserManagement/> */}
+      <DashBoard></DashBoard>
     </>
   )
 }
