@@ -39,17 +39,17 @@ function SideBar() {
   const [activeItem, setActiveItem] = useState(0);
   return (
     <>
+
       <Box sx={{
-        width: sideBarWidth,   // 🔥 BẮT BUỘC
-        minWidth: sideBarWidth,
-        flexShrink: 0,         // 🔥 RẤT QUAN TRỌNG
         display: 'flex',
-        flexDirection: 'column',
         justifyContent: 'space-between',
+        alignItems: 'center',
+        flexDirection: 'column',
+        height: '100vh'
       }}>
         <Box>
           <Logo dimension={{ sideBarWidth, logoHeight }} />
-          <Box>
+          <Box sx={{ flexGrow: 1, pt: 2, px: 2 }}>
             <List sx={{ p: 0 }}>
               {menuItems.map((item, index) => {
                 const IconComponent = item.icon;

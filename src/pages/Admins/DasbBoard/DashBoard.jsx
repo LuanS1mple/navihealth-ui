@@ -1,5 +1,4 @@
 import { Box } from '@mui/material'
-import SideBar from '../../../components/SideBar/SideBar'
 import React, { useState } from 'react';
 import {
   Grid,
@@ -19,6 +18,7 @@ import {
   CalendarToday,
   Download,
 } from '@mui/icons-material';
+import SideBarAdmin from '../SideBar/SideBarAdmin';
 function DashBoard() {
   const [selectedMonth, setSelectedMonth] = useState('Tháng này');
   const packageData = [
@@ -110,7 +110,7 @@ function DashBoard() {
   return (
     <>
       <Box sx={{ display: 'flex', width: `calc(100vw - 20px)`, justifyContent: 'space-between'}}>
-        <SideBar></SideBar>
+        <SideBarAdmin></SideBarAdmin>
         <Box sx={{ width: '100%', ml: 2}}>
           <Box sx={{ display: 'flex',alignItems: 'center', mb: 3,mt: 1 , gap: 2, mx: 2 }}>
             <Typography variant="body2" color="text.secondary">

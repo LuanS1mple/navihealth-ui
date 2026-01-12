@@ -11,6 +11,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
+import requestApi from "../../apis/apis";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -18,7 +19,10 @@ export default function Login() {
   const [rememberMe, setRememberMe] = useState(false);
 
   const handleLogin = () => {
-    console.log("Login clicked");
+    requestApi('auth/login','POST', {
+      username: email,
+      password: password
+    })
   };
 
   const handleGoogleLogin = () => {

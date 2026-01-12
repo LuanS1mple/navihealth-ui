@@ -29,8 +29,15 @@ import {
   Typography,
   Grid,
 } from '@mui/material';
+import requestApi from '../../../apis/apis'
+import { Password } from '@mui/icons-material';
 function HealthRecordList() {
-   const records = [
+  // const test = requestApi('auth/login','POST',{
+  //   username: 'user',
+  //   password: '123456'
+  // })
+  const test = requestApi('auth/logout','POST')
+  const records = [
     {
       id: 1,
       title: 'Xét nghiệm máu tổng quát',
@@ -68,7 +75,6 @@ function HealthRecordList() {
   const handleView = (id) => {
     console.log('View record:', id);
   };
-
   const handleEdit = (id) => {
     console.log('Edit record:', id);
   };
@@ -78,14 +84,14 @@ function HealthRecordList() {
   };
   return (
     <>
-      <Box sx={{display: 'flex'}}>
-        <SideBar/>
+      <Box sx={{ display: 'flex' }}>
+        <SideBar />
         <Box>
-          <TopHeader/>
-          <Box sx={{mx: 4}}>
+          <TopHeader />
+          <Box sx={{ mx: 4 }}>
             {/* tổng quan */}
-            <Box sx={{my: 2}}>
-              <Grid sx={{display: 'flex', gap: 2}} spacing={2 }>
+            <Box sx={{ my: 2 }}>
+              <Grid sx={{ display: 'flex', gap: 2 }} spacing={2}>
                 <Grid item xs={12} md={4} lg={3}>
                   <StatCard
                     title="Tổng hồ sơ"
@@ -102,7 +108,7 @@ function HealthRecordList() {
                     bgColor="rgba(81, 157, 177, 0.2)"
                   />
                 </Grid>
-                <Grid sx={{width: '400px'}} item xs={12} md={4} lg={6}>
+                <Grid sx={{ width: '400px' }} item xs={12} md={4} lg={6}>
                   <Card sx={{ height: '114px', borderRadius: '16px', border: '1px solid rgba(134, 203, 222, 0.3)' }}>
                     <CardContent sx={{ p: '25px', height: '100%' }}>
                       <Typography sx={{ fontSize: '14px', color: '#4a5565', mb: 1 }}>
@@ -148,83 +154,83 @@ function HealthRecordList() {
               </Grid>
             </Box>
             {/* tìm kiếm */}
-                        <Card
-                sx={{
-                  borderRadius: 4,
-                  border: '1px solid rgba(134,203,222,0.3)',
-                  boxShadow: 'none',
-                  mb: 2,
-                  width: '90%'
-                }}
+            <Card
+              sx={{
+                borderRadius: 4,
+                border: '1px solid rgba(134,203,222,0.3)',
+                boxShadow: 'none',
+                mb: 2,
+                width: '90%'
+              }}
             >
-              <CardContent  sx={{ p: 2 }}>
-                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center'}}>
+              <CardContent sx={{ p: 2 }}>
+                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
                   <TextField
-                      fullWidth
-                      placeholder="Tìm kiếm nhắc nhở..."
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <Search size={16} color="#99A1AF" />
-                          </InputAdornment>
-                        ),
-                      }}
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          bgcolor: '#f3f3f5',
-                          borderRadius: 3,
-                          '& fieldset': {
-                            borderColor: 'rgba(134,203,222,0.3)',
-                          },
+                    fullWidth
+                    placeholder="Tìm kiếm nhắc nhở..."
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Search size={16} color="#99A1AF" />
+                        </InputAdornment>
+                      ),
+                    }}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        bgcolor: '#f3f3f5',
+                        borderRadius: 3,
+                        '& fieldset': {
+                          borderColor: 'rgba(134,203,222,0.3)',
                         },
-                      }}
+                      },
+                    }}
                   />
-                    
+
                   <FormControl sx={{ minWidth: 180 }}>
                     <Select
-                        sx={{
-                          bgcolor: '#f3f3f5',
-                          borderRadius: 3,
-                          '& fieldset': {
-                            borderColor: 'rgba(134,203,222,0.3)',
-                          },
-                        }}
-                      >
+                      sx={{
+                        bgcolor: '#f3f3f5',
+                        borderRadius: 3,
+                        '& fieldset': {
+                          borderColor: 'rgba(134,203,222,0.3)',
+                        },
+                      }}
+                    >
                       <MenuItem value="all">Tất cả loại</MenuItem>
                       <MenuItem value="medicine">Uống thuốc</MenuItem>
                       <MenuItem value="checkup">Tái khám</MenuItem>
                       <MenuItem value="measurement">Đo chỉ số</MenuItem>
                       <MenuItem value="exercise">Tập luyện</MenuItem>
                     </Select>
-                    </FormControl>
+                  </FormControl>
 
-                    <FormControl sx={{ minWidth: 104 }}>
-                      <Select
-                        sx={{
-                          bgcolor: '#f3f3f5',
-                          borderRadius: 3,
-                          '& fieldset': {
-                            borderColor: 'rgba(134,203,222,0.3)',
-                          },
-                        }}
-                      >
-                        <MenuItem value="all">Tất cả</MenuItem>
-                        <MenuItem value="active">Đang hoạt động</MenuItem>
-                        <MenuItem value="inactive">Tạm dừng</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-                </CardContent>
-              </Card>                  
+                  <FormControl sx={{ minWidth: 104 }}>
+                    <Select
+                      sx={{
+                        bgcolor: '#f3f3f5',
+                        borderRadius: 3,
+                        '& fieldset': {
+                          borderColor: 'rgba(134,203,222,0.3)',
+                        },
+                      }}
+                    >
+                      <MenuItem value="all">Tất cả</MenuItem>
+                      <MenuItem value="active">Đang hoạt động</MenuItem>
+                      <MenuItem value="inactive">Tạm dừng</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Box>
+              </CardContent>
+            </Card>
             {/* bản ghi */}
             {records.map((record) => (
-                <HealthRecord
-                  key={record.id}
-                  record={record}
-                  onView={handleView}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                />
+              <HealthRecord
+                key={record.id}
+                record={record}
+                onView={handleView}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
             ))}
           </Box>
         </Box>
