@@ -33,8 +33,9 @@ import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import BackHandIcon from '@mui/icons-material/BackHand';
 import requestApi from '../../../apis/apis'
 import { Modal, Backdrop, Fade } from "@mui/material";
-import { UPLOAD_API } from '../../../constants/apis';
+import { UPLOAD_API, SAVE_RECORD } from '../../../constants/apis';
 import ConfirmRecord from './ConfirmRecord/ConfirmRecord';
+import Footer from '../../../components/Footer/Footer';
 function HealthRecordList() {
   // const test = requestApi('auth/login','POST',{
   //   username: 'user',
@@ -140,7 +141,7 @@ function HealthRecordList() {
     "created_at": "2026-01-13T08:09:45.5322034+07:00",
     "url": "123"
   }
-  const test = requestApi('auth/logout', 'POST')
+  // const test = requestApi('auth/logout', 'POST')
   const records = [
     {
       id: 1,
@@ -193,11 +194,10 @@ function HealthRecordList() {
       const uploadedImage = await getImage();
 
       // upload file -> OCR -> AI
-      // const formData = new FormData();
-      // formData.append("file", uploadedImage);
-      // const { data } = await requestApi(UPLOAD_API, "POST", formData, "multipart/form-data");
-
-      const data = responseTemplate; // mock tạm
+      const formData = new FormData();
+      formData.append("files", uploadedImage);
+      const data  = await requestApi(UPLOAD_API, "POST", formData, "multipart/form-data");
+      // const data = responseTemplate; // mock tạm
 
       confirmAndSave(data);
     } catch (e) {
@@ -210,7 +210,7 @@ function HealthRecordList() {
   }
   const handleConfirmSave = async () => {
     try {
-      // await requestApi("/health-record", "POST", confirmData);
+      await requestApi(SAVE_RECORD, "POST", confirmData.data);
       setShowConfirm(false);
       setConfirmData(null);
       alert("Lưu hồ sơ thành công");
@@ -246,6 +246,7 @@ function HealthRecordList() {
       input.click();
     });
   }
+  const style = { display: 'flex', gap: 2 }
   return (
     <>
       <Box sx={{ display: 'flex' }}>
@@ -255,7 +256,7 @@ function HealthRecordList() {
           <Box sx={{ mx: 4 }}>
             {/* tổng quan */}
             <Box sx={{ my: 2 }}>
-              <Grid sx={{ display: 'flex', gap: 2 }} spacing={2}>
+              <Grid sx={style} spacing={2}>
                 <Grid item xs={12} md={4} lg={3}>
                   <StatCard
                     title="Tổng hồ sơ"
@@ -412,6 +413,7 @@ function HealthRecordList() {
               />
             ))}
           </Box>
+          <Footer/>
         </Box>
       </Box>
       <Modal
@@ -444,7 +446,7 @@ function HealthRecordList() {
           >
             {confirmData && (
               <ConfirmRecord
-                data={confirmData}
+                data={confirmData.data}
                 onConfirm={handleConfirmSave}
                 onEdit={handleEditConfirm}
               />

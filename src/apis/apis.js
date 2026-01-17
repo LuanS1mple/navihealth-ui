@@ -3,7 +3,6 @@ import { DOMAIN_API } from "../constants/apis";
 export default function requestApi(endpoint, method, body, responseType = 'json') {
   const headers = {
     'Accept': 'application/json',
-    'Content-Type': 'application/json',
   }
   const instance = axios.create({ headers })
   instance.interceptors.request.use(
@@ -65,6 +64,9 @@ export default function requestApi(endpoint, method, body, responseType = 'json'
     method: method,
     url: `${DOMAIN_API}${endpoint}`,
     data: body,
-    responseType: responseType
+    responseType: responseType,
+    headers: body instanceof FormData
+    ? undefined
+    : { 'Content-Type': 'application/json'}
   })
 }

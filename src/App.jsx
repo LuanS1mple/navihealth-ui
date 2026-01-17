@@ -14,6 +14,7 @@ import MainScreen from "./pages/Admins/MainScreen/MainScreen"
 import UserManagement from "./pages/Admins/UserManagement/UserManagement"
 import DashBoard from "./pages/Admins/DasbBoard/DashBoard"
 import { Routes, Route } from "react-router-dom"
+import Privacy from "./pages/Privacy/Privacy"
 function App() {
   return (
     <>
@@ -36,6 +37,8 @@ function App() {
 
         {/* Default */}
         <Route path="*" element={<Login />} />
+        {/* Privacy */}
+        <Route path="/privacy" element={<Privacy/>}></Route>
       </Routes>
     </>
   )

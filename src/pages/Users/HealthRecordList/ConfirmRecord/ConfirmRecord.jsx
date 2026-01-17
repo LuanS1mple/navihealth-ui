@@ -1,10 +1,9 @@
-import React from 'react'
+import React from "react";
 import {
   Box,
   Card,
   CardContent,
   Typography,
-  Grid,
   Divider,
   Table,
   TableHead,
@@ -14,125 +13,244 @@ import {
   Button,
   Chip
 } from "@mui/material";
-function ConfirmRecord({ data, onConfirm, onEdit }) {
-  const { record_type, record_details, ai_summary } = data;
-  const { patient_info, test_results } = record_details;
 
-  const isHigh = (note) => note === "(H)";
-  return (
-    <>
-      <Card
-        sx={{
-          maxWidth: 900,
-          mx: "auto",
-          my: 4,
-          borderRadius: 3,
-          border: "1px solid #e5e7eb",
-          boxShadow: "none"
-        }}
-      >
-        <CardContent sx={{ p: 4 }}>
-          {/* HEADER */}
-          <Box textAlign="center" mb={3}>
-            <Typography fontWeight={700} fontSize={20}>
-              PHIẾU KẾT QUẢ XÉT NGHIỆM
-            </Typography>
-            <Typography fontSize={14} color="text.secondary">
-              {patient_info.hospital} – {patient_info.section}
-            </Typography>
-          </Box>
-
-          <Divider sx={{ mb: 3 }} />
-
-          {/* PATIENT INFO */}
-          <Grid container spacing={2} mb={3}>
-            <Grid item xs={6}>
-              <Typography><b>Họ tên:</b> {patient_info.full_name}</Typography>
-              <Typography><b>Giới tính:</b> {patient_info.gender}</Typography>
-              <Typography><b>Tuổi:</b> {patient_info.age}</Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <Typography><b>Ngày xét nghiệm:</b> {patient_info.date_of_report}</Typography>
-              <Typography><b>Số BHYT:</b> {patient_info.health_insurance_number}</Typography>
-              <Typography><b>Địa chỉ:</b> {patient_info.address}</Typography>
-            </Grid>
-          </Grid>
-
-          {/* TEST RESULTS */}
-          <Typography fontWeight={600} mb={1}>
-            KẾT QUẢ XÉT NGHIỆM
-          </Typography>
-
-          <Table size="small">
-            <TableHead>
-              <TableRow sx={{ bgcolor: "#f3f4f6" }}>
-                <TableCell><b>Chỉ số</b></TableCell>
-                <TableCell><b>Kết quả</b></TableCell>
-                <TableCell><b>Giá trị bình thường</b></TableCell>
-                <TableCell align="center"><b>Đánh giá</b></TableCell>
-              </TableRow>
-            </TableHead>
-
-            <TableBody>
-              {test_results.map((item, index) => (
-                <TableRow key={index}>
-                  <TableCell>{item.test_name}</TableCell>
-                  <TableCell
-                    sx={{
-                      fontWeight: isHigh(item.note) ? 700 : 400,
-                      color: isHigh(item.note) ? "error.main" : "inherit"
-                    }}
-                  >
-                    {item.result}
-                  </TableCell>
-                  <TableCell>{item.normal_range}</TableCell>
-                  <TableCell align="center">
-                    {isHigh(item.note) ? (
-                      <Chip label="Cao" color="error" size="small" />
-                    ) : (
-                      <Chip label="Bình thường" color="success" size="small" />
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-
-          {/* AI SUMMARY */}
-          <Box mt={3}>
-            <Typography fontWeight={600} mb={1}>
-              NHẬN XÉT TỰ ĐỘNG (AI)
-            </Typography>
-            <Box
-              sx={{
-                bgcolor: "#f8fafc",
-                border: "1px dashed #cbd5e1",
-                p: 2,
-                borderRadius: 2,
-                fontSize: 14
-              }}
-            >
-              {ai_summary}
-            </Box>
-          </Box>
-
-          {/* ACTIONS */}
-          <Box mt={4} display="flex" justifyContent="flex-end" gap={2}>
-            <Button variant="outlined" onClick={onEdit}>
-              Hủy
-            </Button>
-            <Button
-              variant="contained"
-              sx={{ bgcolor: "#2563eb" }}
-              onClick={onConfirm}
-            >
-              Xác nhận lưu hồ sơ
-            </Button>
-          </Box>
-        </CardContent>
-      </Card>
-    </>
-  )
+/* =========================
+   UTILS
+========================= */
+function formatLabel(key) {
+  return key
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-export default ConfirmRecord
+/* =========================
+   SMALL FIELD CARD
+========================= */
+function FieldCard({ label, children }) {
+  return (
+    <Box
+      mb={1.5}
+      p={1.5}
+      borderRadius={2}
+      bgcolor="#f8fafc"
+      border="1px solid #e5e7eb"
+    >
+      <Typography
+        fontWeight={600}
+        fontSize={13}
+        color="text.secondary"
+        mb={0.5}
+      >
+        {label}
+      </Typography>
+      {children}
+    </Box>
+  );
+}
+
+/* =========================
+   RENDER VALUE (CORE)
+========================= */
+function RenderValue({ value }) {
+  // null / undefined
+  if (value === null || value === undefined) {
+    return (
+      <Typography color="text.secondary" fontStyle="italic">
+        Không có dữ liệu
+      </Typography>
+    );
+  }
+
+  // boolean
+  if (typeof value === "boolean") {
+    return (
+      <Chip
+        size="small"
+        label={value ? "Có" : "Không"}
+        color={value ? "success" : "default"}
+      />
+    );
+  }
+
+  // array
+  if (Array.isArray(value)) {
+    if (value.length === 0) {
+      return (
+        <Typography color="text.secondary" fontStyle="italic">
+          Danh sách rỗng
+        </Typography>
+      );
+    }
+
+    // array of objects → table
+    if (typeof value[0] === "object" && value[0] !== null) {
+      const columns = Array.from(
+        new Set(value.flatMap((item) => Object.keys(item || {})))
+      );
+
+      return (
+        <Table
+          size="small"
+          sx={{
+            mt: 1,
+            border: "1px solid #e5e7eb",
+            borderRadius: 2,
+            overflow: "hidden"
+          }}
+        >
+          <TableHead>
+            <TableRow sx={{ bgcolor: "#f1f5f9" }}>
+              {columns.map((col) => (
+                <TableCell key={col}>
+                  <Typography fontWeight={600} fontSize={13}>
+                    {formatLabel(col)}
+                  </Typography>
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+
+          <TableBody>
+            {value.map((row, i) => (
+              <TableRow key={i} hover>
+                {columns.map((col) => (
+                  <TableCell key={col} valign="top">
+                    <RenderValue value={row?.[col]} />
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      );
+    }
+
+    // array of primitive
+    return (
+      <Box display="flex" gap={1} flexWrap="wrap">
+        {value.map((item, i) => (
+          <Chip key={i} label={String(item)} size="small" />
+        ))}
+      </Box>
+    );
+  }
+
+  // object
+  if (typeof value === "object") {
+    return (
+      <Box pl={1} mt={1}>
+        {Object.entries(value).map(([k, v]) => (
+          <FieldCard key={k} label={formatLabel(k)}>
+            <RenderValue value={v} />
+          </FieldCard>
+        ))}
+      </Box>
+    );
+  }
+
+  // string / number
+  return (
+    <Typography sx={{ whiteSpace: "pre-wrap" }}>
+      {String(value)}
+    </Typography>
+  );
+}
+
+/* =========================
+   SECTION
+========================= */
+function DynamicSection({ title, data }) {
+  if (data === undefined || data === null) return null;
+
+  return (
+    <Box mb={5}>
+      <Typography
+        fontWeight={700}
+        fontSize={15}
+        mb={1}
+        sx={{ textTransform: "uppercase" }}
+      >
+        {formatLabel(title)}
+      </Typography>
+
+      <Divider sx={{ mb: 2 }} />
+
+      <RenderValue value={data} />
+    </Box>
+  );
+}
+
+/* =========================
+   MAIN COMPONENT
+========================= */
+function ConfirmRecord({ data, onConfirm, onEdit }) {
+  let parsedData = data;
+
+  // nếu backend trả string JSON
+  if (typeof data === "string") {
+    try {
+      parsedData = JSON.parse(data);
+    } catch {
+      parsedData = { raw_data: data };
+    }
+  }
+
+  if (!parsedData || typeof parsedData !== "object") {
+    return (
+      <Typography textAlign="center" mt={4} color="text.secondary">
+        Không có dữ liệu hồ sơ
+      </Typography>
+    );
+  }
+
+  return (
+    <Card
+      sx={{
+        maxWidth: 900,
+        mx: "auto",
+        my: 4,
+        borderRadius: 3,
+        border: "1px solid #e5e7eb",
+        boxShadow: "none"
+      }}
+    >
+      <CardContent sx={{ p: 4 }}>
+        {/* HEADER */}
+        <Typography
+          textAlign="center"
+          fontWeight={800}
+          fontSize={22}
+          mb={4}
+          letterSpacing={1}
+        >
+          XÁC NHẬN HỒ SƠ Y TẾ
+        </Typography>
+
+        {/* DYNAMIC CONTENT */}
+        {Object.entries(parsedData).map(([key, value]) => (
+          <DynamicSection
+            key={key}
+            title={key}
+            data={value}
+          />
+        ))}
+
+        {/* ACTIONS */}
+        <Box mt={4} display="flex" justifyContent="flex-end" gap={2}>
+          <Button variant="outlined" onClick={onEdit}>
+            Quay lại
+          </Button>
+          <Button
+            variant="contained"
+            sx={{ bgcolor: "#2563eb" }}
+            onClick={onConfirm}
+          >
+            Xác nhận lưu hồ sơ
+          </Button>
+        </Box>
+      </CardContent>
+    </Card>
+  );
+}
+
+export default ConfirmRecord;

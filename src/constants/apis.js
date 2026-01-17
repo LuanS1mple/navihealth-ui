@@ -1,2 +1,3 @@
-export const DOMAIN_API = 'https://localhost:7134/api/'
-export const UPLOAD_API = 'https://localhost:7134/api/upload/test-multi-ocr'
+export const DOMAIN_API = 'http://localhost:5062/api/'
+export const UPLOAD_API = 'medical-record/extract'
+export const SAVE_RECORD = 'medical-record/save'
