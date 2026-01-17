@@ -15,6 +15,8 @@ import UserManagement from "./pages/Admins/UserManagement/UserManagement"
 import DashBoard from "./pages/Admins/DasbBoard/DashBoard"
 import { Routes, Route } from "react-router-dom"
 import Privacy from "./pages/Privacy/Privacy"
+import ResetPassword from "./pages/ResetPassword/ResetPassword"
+import EmailReset from "./pages/EmailReset/EmailReset"
 function App() {
   return (
     <>
@@ -22,6 +24,8 @@ function App() {
         {/* Auth */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/reset" element={<ResetPassword />} />
+        <Route path="/email" element={<EmailReset />} />
 
         {/* Pages */}
         <Route path="/health-records" element={<HealthRecordList />} />
