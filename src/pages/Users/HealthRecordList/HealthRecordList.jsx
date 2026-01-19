@@ -1,21 +1,11 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import HealthRecord from '../../../components/HealthRecord/HealthRecord';
-import SideBar from '../../../components/SideBar/SideBar';
-import TopHeader from '../../../components/HeadBar/HeadBar';
-import { Box } from '@mui/material';
+// Removed SideBar, TopHeader, Footer as they are in MainLayout
 import StatCard from './StatCard/StatCard';
+import ConfirmRecord from './ConfirmRecord/ConfirmRecord';
+
 import {
-  FileText,
-  Calendar,
-  Upload,
-  GitCompare,
-  Search,
-  Eye,
-  Edit,
-  Trash2,
-  Filter,
-} from 'lucide-react';
-import {
+  Box,
   Card,
   CardContent,
   TextField,
@@ -28,158 +18,67 @@ import {
   InputAdornment,
   Typography,
   Grid,
+  Modal,
+  Backdrop,
+  Fade
 } from '@mui/material';
+
+import {
+  FileText,
+  Calendar,
+  Upload,
+  GitCompare,
+  Search,
+} from 'lucide-react';
+
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import BackHandIcon from '@mui/icons-material/BackHand';
+
 import requestApi from '../../../apis/apis'
-import { Modal, Backdrop, Fade } from "@mui/material";
-import { UPLOAD_API, SAVE_RECORD } from '../../../constants/apis';
-import ConfirmRecord from './ConfirmRecord/ConfirmRecord';
-import Footer from '../../../components/Footer/Footer';
+import { UPLOAD_API, SAVE_RECORD, GET_RECORDS } from '../../../constants/apis';
+
 function HealthRecordList() {
-  // const test = requestApi('auth/login','POST',{
-  //   username: 'user',
-  //   password: '123456'
-  // })
-  const responseTemplate = {
-    "_id": "generated_id",
-    "user_id": "123",
-    "record_type": "MultiPage_BloodTest",
-    "record_details": {
-      "patient_info": {
-        "full_name": "NGUYỄN VĂN A",
-        "age": 35,
-        "gender": "Nam",
-        "address": "Sơn Tây, Hà Nội",
-        "health_insurance_number": "01 01 23456789",
-        "hospital": "BV Đa khoa Tâm Anh",
-        "date_of_report": "08/01/2026",
-        "section": "Khoa nội tổng hợp"
-      },
-      "test_results": [
-        {
-          "test_name": "Urê",
-          "normal_range": "2,5 - 7,5 mmol/L",
-          "result": 5.2
-        },
-        {
-          "test_name": "Glucose",
-          "normal_range": "3,9 - 6,4 mmol/L",
-          "result": 7.1,
-          "note": "(H)"
-        },
-        {
-          "test_name": "Creatinin",
-          "normal_range": "Nam: 62 - 120 µmol/L",
-          "result": 88
-        },
-        {
-          "test_name": "Acid Uric",
-          "normal_range": "Nam: 180 - 420 µmol/L",
-          "result": 350
-        },
-        {
-          "test_name": "Protein T.P",
-          "normal_range": "65 - 82 g/L",
-          "result": 72
-        },
-        {
-          "test_name": "Albumin",
-          "normal_range": "35 - 50 g/L",
-          "result": 42
-        },
-        {
-          "test_name": "Cholesterol",
-          "normal_range": "3,9 - 5,2 mmol/L",
-          "result": 5.8,
-          "note": "(H)"
-        },
-        {
-          "test_name": "HDL-cholesterol",
-          "normal_range": "≥ 0,9 mmol/L",
-          "result": 1.1
-        },
-        {
-          "test_name": "LDL-cholesterol",
-          "normal_range": "≤ 3,4 mmol/L",
-          "result": 3.8,
-          "note": "(H)"
-        },
-        {
-          "test_name": "Na+",
-          "normal_range": "135 - 145 mmol/L",
-          "result": 140
-        },
-        {
-          "test_name": "Cl-",
-          "normal_range": "98 - 106 mmol/L",
-          "result": 102
-        },
-        {
-          "test_name": "pH động mạch",
-          "normal_range": "7,37 - 7,45",
-          "result": 7.41
-        },
-        {
-          "test_name": "pCO2",
-          "normal_range": "Nam: 35 - 46 mmHg",
-          "result": 40
-        },
-        {
-          "test_name": "pO2 động mạch",
-          "normal_range": "71 - 104 mmHg",
-          "result": 95
-        },
-        {
-          "test_name": "HCO3 chuẩn",
-          "normal_range": "21 - 26 mmol/L",
-          "result": 24
+
+  /* =======================
+     STATE
+  ======================= */
+  const [records, setRecords] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const [confirmData, setConfirmData] = useState(null);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  /* =======================
+     FETCH RECORDS (FIXED)
+  ======================= */
+  useEffect(() => {
+    const fetchRecords = async () => {
+      setLoading(true);
+      try {
+        const response = await requestApi(GET_RECORDS, 'GET');
+        if (response.status === 200) {
+          setRecords(response.data);
+        } else {
+          setRecords([]);
         }
-      ]
-    },
-    "ai_summary": "Bệnh nhân có chỉ số Glucose và mỡ máu (Cholesterol, Triglycerid, LDL) hởi cao so với ngưỡng bình thường. Cần điều chỉnh chế độ ăn uống, giảm tinh bột và chất béo bảo hòa. Các chỉ số chức năng gan, thận và khí máu trong giới hạn bình thường.",
-    "created_at": "2026-01-13T08:09:45.5322034+07:00",
-    "url": "123"
-  }
-  // const test = requestApi('auth/logout', 'POST')
-  const records = [
-    {
-      id: 1,
-      title: 'Xét nghiệm máu tổng quát',
-      type: 'Kết quả xét nghiệm',
-      date: '15/10/2024',
-      doctor: 'BS. Nguyễn Văn A',
-      facility: 'Bệnh viện Đa khoa Trung ương',
-      description: 'Kết quả xét nghiệm định kỳ hàng quý',
-      tags: ['Định kỳ', 'Xét nghiệm'],
-      iconType: 'file',
-    },
-    {
-      id: 2,
-      title: 'Đơn thuốc điều trị',
-      type: 'Đơn thuốc',
-      date: '20/10/2024',
-      doctor: 'BS. Trần Thị B',
-      facility: 'Phòng khám Tim mạch',
-      description: 'Đơn thuốc điều trị huyết áp cao',
-      tags: ['Huyết áp', 'Điều trị'],
-      iconType: 'prescription',
-    },
-    {
-      id: 3,
-      title: 'Chụp X-quang phổi',
-      type: 'Hình ảnh y khoa',
-      date: '5/9/2024',
-      doctor: 'BS. Lê Văn C',
-      facility: 'Bệnh viện Đa Khoa',
-      description: 'Kiểm tra sức khỏe định kỳ',
-      tags: ['Hình ảnh', 'Khám tổng quát'],
-      iconType: 'prescription',
-    },
-  ];
+      } catch (err) {
+        console.error(err);
+        setRecords([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRecords();
+  }, []);
+
+  /* =======================
+     HANDLERS
+  ======================= */
   const handleView = (id) => {
     console.log('View record:', id);
   };
+
   const handleEdit = (id) => {
     console.log('Edit record:', id);
   };
@@ -187,27 +86,27 @@ function HealthRecordList() {
   const handleDelete = (id) => {
     console.log('Delete record:', id);
   };
-  const [confirmData, setConfirmData] = React.useState(null);
-  const [showConfirm, setShowConfirm] = React.useState(false);
+
   const handleUpload = async () => {
     try {
       const uploadedImage = await getImage();
-
-      // upload file -> OCR -> AI
       const formData = new FormData();
       formData.append("files", uploadedImage);
-      const data  = await requestApi(UPLOAD_API, "POST", formData, "multipart/form-data");
-      // const data = responseTemplate; // mock tạm
 
-      confirmAndSave(data);
+      const data = await requestApi(
+        UPLOAD_API,
+        "POST",
+        formData,
+        "multipart/form-data"
+      );
+
+      setConfirmData(data);
+      setShowConfirm(true);
     } catch (e) {
       console.error(e);
     }
-  }
-  const confirmAndSave = (data) => {
-    setConfirmData(data);
-    setShowConfirm(true);
-  }
+  };
+
   const handleConfirmSave = async () => {
     try {
       await requestApi(SAVE_RECORD, "POST", confirmData.data);
@@ -218,232 +117,241 @@ function HealthRecordList() {
       console.error(e);
     }
   };
+
   const handleEditConfirm = () => {
     setShowConfirm(false);
   };
+
+  /* =======================
+     PICK IMAGE
+  ======================= */
   const getImage = () => {
     return new Promise((resolve, reject) => {
       const input = document.createElement("input");
       input.type = "file";
-      input.accept = "image/*"; // chỉ cho ảnh
+      input.accept = "image/*";
 
       input.onchange = () => {
         const file = input.files[0];
-
-        if (!file) {
-          reject("Không có file được chọn");
-          return;
-        }
-
-        if (!file.type.startsWith("image/")) {
-          reject("Chỉ được chọn file ảnh");
-          return;
-        }
-
-        resolve(file); // ✅ TRẢ VỀ FILE Ở ĐÂY
+        if (!file) return reject("Không có file");
+        if (!file.type.startsWith("image/")) return reject("Không phải ảnh");
+        resolve(file);
       };
 
       input.click();
     });
-  }
-  const style = { display: 'flex', gap: 2 }
+  };
+
+  /* =======================
+     RENDER
+  ======================= */
   return (
     <>
-      <Box sx={{ display: 'flex' }}>
-        <SideBar />
-        <Box>
-          <TopHeader />
-          <Box sx={{ mx: 4 }}>
-            {/* tổng quan */}
-            <Box sx={{ my: 2 }}>
-              <Grid sx={style} spacing={2}>
-                <Grid item xs={12} md={4} lg={3}>
-                  <StatCard
-                    title="Tổng hồ sơ"
-                    value="3"
-                    icon={FileText}
-                    bgColor="rgba(135, 199, 236, 0.2)"
-                  />
-                </Grid>
-                <Grid item xs={12} md={4} lg={3}>
-                  <StatCard
-                    title="Tháng này"
-                    value="0"
-                    icon={Calendar}
-                    bgColor="rgba(81, 157, 177, 0.2)"
-                  />
-                </Grid>
-                <Grid sx={{ width: '400px' }} item xs={12} md={4} lg={6}>
-                  <Card sx={{ height: '114px', borderRadius: '16px', border: '1px solid rgba(134, 203, 222, 0.3)' }}>
-                    <CardContent sx={{ p: '25px', height: '100%' }}>
-                      <Typography sx={{ fontSize: '14px', color: '#4a5565', mb: 1 }}>
-                        Thao tác nhanh
-                      </Typography>
-                      <Box sx={{ display: 'flex', gap: 1 }}>
-                        <Button
-                          variant="contained"
-                          startIcon={<CameraAltIcon size={16} />}
-                          sx={{
-                            background: 'linear-gradient(to bottom, #519db1, #004aad)',
-                            borderRadius: '12px',
-                            textTransform: 'none',
-                            fontSize: '12px',
-                            height: '36px',
-                            flex: 1,
-                          }}
-                          onClick={handleUpload}
-                        >
-                          Tải ảnh
-                        </Button>
-                        <Button
-                          variant="contained"
-                          startIcon={<BackHandIcon size={16} />}
-                          sx={{
-                            background: 'linear-gradient(to bottom, #519db1, #004aad)',
-                            borderRadius: '12px',
-                            textTransform: 'none',
-                            fontSize: '12px',
-                            height: '36px',
-                            flex: 1,
-                          }}
-                        >
-                          Nhập tay
-                        </Button>
-                        <Button
-                          variant="outlined"
-                          startIcon={<GitCompare size={16} />}
-                          sx={{
-                            borderColor: '#519db1',
-                            color: '#519db1',
-                            borderRadius: '12px',
-                            textTransform: 'none',
-                            fontSize: '12px',
-                            height: '36px',
-                            '&:hover': {
-                              borderColor: '#519db1',
-                              backgroundColor: 'rgba(81, 157, 177, 0.1)',
-                            },
-                          }}
-                        >
-                          So sánh
-                        </Button>
-                      </Box>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              </Grid>
-            </Box>
-            {/* tìm kiếm */}
-            <Card
-              sx={{
-                borderRadius: 4,
-                border: '1px solid rgba(134,203,222,0.3)',
-                boxShadow: 'none',
-                mb: 2,
-                width: '90%'
-              }}
-            >
-              <CardContent sx={{ p: 2 }}>
-                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                  <TextField
-                    fullWidth
-                    placeholder="Tìm kiếm nhắc nhở..."
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <Search size={16} color="#99A1AF" />
-                        </InputAdornment>
-                      ),
-                    }}
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        bgcolor: '#f3f3f5',
-                        borderRadius: 3,
-                        '& fieldset': {
-                          borderColor: 'rgba(134,203,222,0.3)',
-                        },
-                      },
-                    }}
-                  />
-
-                  <FormControl sx={{ minWidth: 180 }}>
-                    <Select
-                      sx={{
-                        bgcolor: '#f3f3f5',
-                        borderRadius: 3,
-                        '& fieldset': {
-                          borderColor: 'rgba(134,203,222,0.3)',
-                        },
-                      }}
-                    >
-                      <MenuItem value="all">Tất cả loại</MenuItem>
-                      <MenuItem value="medicine">Uống thuốc</MenuItem>
-                      <MenuItem value="checkup">Tái khám</MenuItem>
-                      <MenuItem value="measurement">Đo chỉ số</MenuItem>
-                      <MenuItem value="exercise">Tập luyện</MenuItem>
-                    </Select>
-                  </FormControl>
-
-                  <FormControl sx={{ minWidth: 104 }}>
-                    <Select
-                      sx={{
-                        bgcolor: '#f3f3f5',
-                        borderRadius: 3,
-                        '& fieldset': {
-                          borderColor: 'rgba(134,203,222,0.3)',
-                        },
-                      }}
-                    >
-                      <MenuItem value="all">Tất cả</MenuItem>
-                      <MenuItem value="active">Đang hoạt động</MenuItem>
-                      <MenuItem value="inactive">Tạm dừng</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Box>
-              </CardContent>
-            </Card>
-            {/* bản ghi */}
-            {records.map((record) => (
-              <HealthRecord
-                key={record.id}
-                record={record}
-                onView={handleView}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
+      <Box>
+        {/* ===== STATS ===== */}
+        <Box sx={{ my: { xs: 1.5, sm: 2 } }}>
+          <Grid container spacing={{ xs: 1.5, sm: 2, md: 2.5 }} sx={{ px: { xs: 0, sm: 0 } }}>
+            <Grid item xs={12} md={4} lg={3}>
+              <StatCard
+                title="Tổng hồ sơ"
+                value={records.length}
+                icon={FileText}
+                bgColor="rgba(135, 199, 236, 0.15)"
               />
-            ))}
-          </Box>
-          <Footer/>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={4} lg={3} sx={{ display: { xs: 'none', md: 'grid' } }}>
+              <StatCard
+                title="Tháng này"
+                value="0"
+                icon={Calendar}
+                bgColor="rgba(81, 157, 177, 0.15)"
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={4} lg={6}>
+              <Card
+                sx={{
+                  height: { xs: 'auto', md: '114px' },
+                  borderRadius: { xs: '12px', md: '16px' },
+                  background: (theme) => theme.palette.mode === 'dark'
+                    ? 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)'
+                    : 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(245,247,250,0.95) 100%)',
+                  border: (theme) => `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'}`,
+                  boxShadow: (theme) => theme.palette.mode === 'dark'
+                    ? '0 4px 20px rgba(0,0,0,0.3)'
+                    : '0 4px 20px rgba(0,0,0,0.08)',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    boxShadow: (theme) => theme.palette.mode === 'dark'
+                      ? '0 6px 30px rgba(0,0,0,0.4)'
+                      : '0 6px 30px rgba(0,0,0,0.12)',
+                  }
+                }}
+              >
+                <CardContent sx={{ p: { xs: '14px', md: '20px' }, py: { xs: '12px', md: '20px' } }}>
+                  <Typography sx={{ fontSize: { xs: '12px', sm: '13px', md: '14px' }, fontWeight: 700, mb: { xs: 0.75, md: 1.2 }, color: (theme) => theme.palette.mode === 'dark' ? '#fff' : '#1a1a1a' }}>
+                    Thao tác nhanh
+                  </Typography>
+
+                  <Box sx={{ display: 'flex', gap: { xs: 0.6, sm: 0.8, md: 1 }, flexWrap: 'wrap' }}>
+                    <Button
+                      variant="contained"
+                      startIcon={<CameraAltIcon sx={{ fontSize: { xs: '16px', md: '18px' } }} />}
+                      onClick={handleUpload}
+                      size="small"
+                      sx={{
+                        fontSize: { xs: '11px', sm: '12px', md: '13px' },
+                        padding: { xs: '6px 12px', sm: '8px 14px', md: '8px 16px' },
+                        fontWeight: 600,
+                        background: 'linear-gradient(135deg, #004aad 0%, #003a8c 100%)',
+                        boxShadow: '0 4px 12px rgba(0, 74, 173, 0.3)',
+                        transition: 'all 0.3s ease',
+                        '&:hover': {
+                          boxShadow: '0 6px 20px rgba(0, 74, 173, 0.4)',
+                          transform: 'translateY(-2px)'
+                        },
+                        '& .MuiButton-startIcon': {
+                          marginRight: { xs: '4px', md: '6px' },
+                        }
+                      }}
+                    >
+                      Tải ảnh
+                    </Button>
+
+                    <Button
+                      variant="contained"
+                      startIcon={<BackHandIcon sx={{ fontSize: { xs: '16px', md: '18px' } }} />}
+                      size="small"
+                      sx={{
+                        fontSize: { xs: '11px', sm: '12px', md: '13px' },
+                        padding: { xs: '6px 12px', sm: '8px 14px', md: '8px 16px' },
+                        fontWeight: 600,
+                        background: 'linear-gradient(135deg, #0288d1 0%, #0277bd 100%)',
+                        boxShadow: '0 4px 12px rgba(2, 136, 209, 0.3)',
+                        transition: 'all 0.3s ease',
+                        display: { xs: 'none', sm: 'inline-flex' },
+                        '&:hover': {
+                          boxShadow: '0 6px 20px rgba(2, 136, 209, 0.4)',
+                          transform: 'translateY(-2px)'
+                        },
+                        '& .MuiButton-startIcon': {
+                          marginRight: { xs: '4px', md: '6px' },
+                        }
+                      }}
+                    >
+                      Nhập tay
+                    </Button>
+
+                    <Button
+                      variant="outlined"
+                      startIcon={<GitCompare size={16} />}
+                      size="small"
+                      sx={{
+                        fontSize: { xs: '11px', sm: '12px', md: '13px' },
+                        padding: { xs: '6px 12px', sm: '8px 14px', md: '8px 16px' },
+                        fontWeight: 600,
+                        borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.3)' : 'rgba(0, 74, 173, 0.4)',
+                        color: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.8)' : '#004aad',
+                        transition: 'all 0.3s ease',
+                        display: { xs: 'none', sm: 'inline-flex' },
+                        '&:hover': {
+                          borderColor: '#004aad',
+                          backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(0, 74, 173, 0.1)' : 'rgba(0, 74, 173, 0.08)',
+                          transform: 'translateY(-2px)'
+                        },
+                        '& .MuiButton-startIcon': {
+                          marginRight: { xs: '4px', md: '6px' },
+                        }
+                      }}
+                    >
+                      So sánh
+                    </Button>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
         </Box>
+
+        {/* ===== SEARCH ===== */}
+        <Card sx={{
+          mb: { xs: 1.5, md: 2.5 },
+          width: '100%',
+          borderRadius: { xs: '12px', md: '14px' },
+          background: (theme) => theme.palette.mode === 'dark'
+            ? 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)'
+            : 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(250,251,252,1) 100%)',
+          border: (theme) => `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'}`,
+          boxShadow: (theme) => theme.palette.mode === 'dark'
+            ? '0 4px 20px rgba(0,0,0,0.3)'
+            : '0 4px 20px rgba(0,0,0,0.08)',
+          transition: 'all 0.3s ease'
+        }}>
+          <CardContent sx={{ p: { xs: '12px', md: '16px' } }}>
+            <TextField
+              fullWidth
+              placeholder="Tìm kiếm hồ sơ sức khỏe..."
+              size="small"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Search size={18} color="#519db1" />
+                  </InputAdornment>
+                ),
+              }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  fontSize: { xs: '12px', sm: '13px', md: '14px' },
+                  borderRadius: { xs: '8px', md: '10px' },
+                  height: { xs: '38px', md: '42px' },
+                  backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.8)',
+                  transition: 'all 0.3s ease',
+                  '& fieldset': {
+                    borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: '#519db1 !important',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#004aad !important',
+                    boxShadow: '0 0 0 3px rgba(0, 74, 173, 0.1)',
+                  }
+                },
+              }}
+            />
+          </CardContent>
+        </Card>
+
+        {/* ===== RECORD LIST ===== */}
+        {loading && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', py: 5 }}>
+            <Typography sx={{ fontSize: { xs: '13px', md: '14px' }, color: 'text.secondary' }}>
+              ⏳ Đang tải hồ sơ của bạn...
+            </Typography>
+          </Box>
+        )}
+
+        {!loading && records.map((record) => (
+          <HealthRecord
+            key={record.id || record._id}
+            record={record}
+            onView={handleView}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        ))}
       </Box>
+
+      {/* ===== CONFIRM MODAL ===== */}
       <Modal
         open={showConfirm}
         onClose={handleEditConfirm}
         closeAfterTransition
         slots={{ backdrop: Backdrop }}
-        slotProps={{
-          backdrop: {
-            timeout: 300,
-            sx: {
-              backdropFilter: "blur(4px)",
-              backgroundColor: "rgba(0,0,0,0.4)"
-            }
-          }
-        }}
       >
         <Fade in={showConfirm}>
-          <Box
-            sx={{
-              position: "fixed",
-              inset: 0,
-              overflowY: "auto",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "flex-start",
-              py: 1,
-              pl: 4
-            }}
-          >
+          <Box sx={{ p: 2 }}>
             {confirmData && (
               <ConfirmRecord
                 data={confirmData.data}
@@ -455,7 +363,7 @@ function HealthRecordList() {
         </Fade>
       </Modal>
     </>
-  )
+  );
 }
 
-export default HealthRecordList
+export default HealthRecordList;

@@ -13,8 +13,15 @@ import {
   InputAdornment
 } from '@mui/material';
 import { LockReset, Send, CheckCircle, Mail, Visibility, VisibilityOff } from '@mui/icons-material';
+import requestApi from '../../apis/apis';
+import { RESET_PASSWORD } from '../../constants/apis';
+import { useSearchParams, useNavigate } from "react-router-dom";
 
 export default function ResetPassword() {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  const email = searchParams.get("email");
   const [otpCode, setOtpCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -28,20 +35,20 @@ export default function ResetPassword() {
   const handleResendOTP = async () => {
     setResendLoading(true);
     setMessage('');
-    
+
     // Giả lập API call
     setTimeout(() => {
       setResendLoading(false);
       setMessage('Mã OTP đã được gửi lại thành công!');
       setMessageType('success');
-      
+
       // Tự động ẩn thông báo sau 3 giây
       setTimeout(() => setMessage(''), 3000);
     }, 1500);
   };
 
   const handleVerifyOTP = async () => {
-    if (!otpCode || otpCode.length < 6) {
+    if (!otpCode || otpCode.length !== 6) {
       setMessage('Vui lòng nhập mã OTP hợp lệ (6 ký tự)');
       setMessageType('error');
       return;
@@ -62,17 +69,32 @@ export default function ResetPassword() {
     setLoading(true);
     setMessage('');
 
-    // Giả lập API call
-    setTimeout(() => {
+    const body = {
+      email,
+      otp: otpCode,
+      newPassword
+    };
+
+    try {
+      const response = await requestApi(RESET_PASSWORD, 'POST', body);
+
+      if (response.data === 'Password reset successful') {
+        setMessage('Đặt lại mật khẩu thành công! Đang chuyển hướng...');
+        setMessageType('success');
+
+        setTimeout(() => {
+          navigate('/login', { replace: true });
+        }, 2000);
+      } else {
+        setMessage(response.data || 'Đặt lại mật khẩu thất bại');
+        setMessageType('error');
+      }
+    } catch (err) {
+      setMessage(err?.response?.data || 'Có lỗi xảy ra, vui lòng thử lại');
+      setMessageType('error');
+    } finally {
       setLoading(false);
-      setMessage('Đặt lại mật khẩu thành công! Đang chuyển hướng...');
-      setMessageType('success');
-      
-      // Sau khi xác nhận thành công, có thể chuyển sang màn hình đăng nhập
-      setTimeout(() => {
-        window.location.href = "http://localhost:5173/login"
-      }, 2000);
-    }, 1500);
+    }
   };
 
   const handleOtpChange = (e) => {
@@ -187,14 +209,14 @@ export default function ResetPassword() {
                 placeholder="000000"
                 inputProps={{
                   maxLength: 6,
-                  style: { 
-                    textAlign: 'center', 
+                  style: {
+                    textAlign: 'center',
                     fontSize: '32px',
                     letterSpacing: '12px',
                     fontWeight: 600
                   }
                 }}
-                sx={{ 
+                sx={{
                   mb: 3,
                   '& .MuiOutlinedInput-root': {
                     height: '80px'
@@ -263,7 +285,7 @@ export default function ResetPassword() {
                   startIcon={resendLoading ? <CircularProgress size={20} /> : <Send />}
                   onClick={handleResendOTP}
                   disabled={resendLoading || loading}
-                  sx={{ 
+                  sx={{
                     py: 1.8,
                     textTransform: 'none',
                     fontSize: '16px',
@@ -280,7 +302,7 @@ export default function ResetPassword() {
                   startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <CheckCircle />}
                   onClick={handleVerifyOTP}
                   disabled={loading || resendLoading || otpCode.length !== 6 || !newPassword || !confirmPassword}
-                  sx={{ 
+                  sx={{
                     py: 1.8,
                     textTransform: 'none',
                     fontSize: '16px',

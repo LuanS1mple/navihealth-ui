@@ -2,6 +2,7 @@ import React from "react"
 import NaviHealth from "../src/pages/Home/index"
 import Login from "../src/pages/Login/index"
 import Register from "../src/pages/Register/index"
+import MainLayout from "./layouts/MainLayout"
 import SideBar from "./components/SideBar/SideBar"
 import { Box } from "@mui/material"
 import Main from "./pages/Users/Main/Main"
@@ -21,28 +22,31 @@ function App() {
   return (
     <>
       <Routes>
-        {/* Auth */}
+        {/* Auth (No Layout) */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/reset" element={<ResetPassword />} />
         <Route path="/email" element={<EmailReset />} />
 
-        {/* Pages */}
-        <Route path="/health-records" element={<HealthRecordList />} />
-        <Route path="/reminders" element={<ReminderList />} />
-        <Route path="/main-screen" element={<MainScreen />} />
-        <Route path="/users" element={<UserManagement />} />
-        <Route path="/dashboard" element={<DashBoard />} />
+        {/* Authenticated Pages (With MainLayout) */}
+        <Route element={<MainLayout />}>
+          <Route path="/health-records" element={<HealthRecordList />} />
+          <Route path="/reminders" element={<ReminderList />} />
+          <Route path="/main-screen" element={<MainScreen />} />
+          <Route path="/users" element={<UserManagement />} />
+          <Route path="/dashboard" element={<DashBoard />} />
 
-        {/* Components demo */}
+          {/* Components demo / Old routes mapped to layout */}
+          <Route path="/main" element={<Main />} />
+          <Route path="/chatbot" element={<ChatBot />} />
+          <Route path="/privacy" element={<Privacy />} />
+        </Route>
+
+        {/* Standalone Sidebar Demo (Keep if needed, otherwise could remove) */}
         <Route path="/sidebar" element={<SideBar />} />
-        <Route path="/main" element={<Main />} />
-        <Route path="/chatbot" element={<ChatBot />} />
 
         {/* Default */}
         <Route path="*" element={<Login />} />
-        {/* Privacy */}
-        <Route path="/privacy" element={<Privacy/>}></Route>
       </Routes>
     </>
   )

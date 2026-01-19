@@ -3,8 +3,10 @@ import { Box, Container, TextField, Button, Typography, Paper, Alert, CircularPr
 import { MailOutline, Send } from '@mui/icons-material';
 import requestApi from '../../apis/apis';
 import { SEND_EMAIL_RESET } from '../../constants/apis';
+import { useNavigate } from 'react-router-dom';
 
 export default function EmailReset() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -35,12 +37,21 @@ export default function EmailReset() {
 
     // Mock API call - This would be replaced with actual backend call
     try {
-      const body = { email}
-      requestApi(SEND_EMAIL_RESET,'POST', body)
+      const body = { email }
+      const response = await requestApi(SEND_EMAIL_RESET, 'POST', body)
       // Simulate success
-      window.location.href = 'http://localhost:5173/reset'
-      setSuccess(true);
-      setEmail('');
+      if (response.data) {
+        setSuccess(true);
+        setEmail('');
+        setTimeout(() => {
+          navigate(`/reset?email=${encodeURIComponent(email)}`);
+        }, 2000);
+      }
+      else {
+        setError('Email không tồn tại, vui lòng thử l');
+        setSuccess(false);
+        setEmail('');
+      }
     } catch (err) {
       setError('Có lỗi xảy ra. Vui lòng thử lại.');
     } finally {
@@ -52,34 +63,44 @@ export default function EmailReset() {
     <Box
       sx={{
         minHeight: '100vh',
-        width: '100vw',
+        width: '100%',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        padding: 2,
+        padding: { xs: 1, sm: 2, md: 3 },
       }}
     >
       <Container maxWidth="sm">
         <Paper
           elevation={6}
           sx={{
-            padding: 4,
+            padding: { xs: 2.5, sm: 3, md: 4 },
             borderRadius: 3,
           }}
         >
-          <Box sx={{ textAlign: 'center', mb: 4 }}>
-            <MailOutline sx={{ fontSize: 64, color: '#667eea', mb: 2 }} />
-            <Typography variant="h4" component="h1" gutterBottom fontWeight={600}>
+          <Box sx={{ textAlign: 'center', mb: { xs: 3, sm: 4 } }}>
+            <MailOutline sx={{ fontSize: { xs: 48, sm: 56, md: 64 }, color: '#667eea', mb: 2 }} />
+            <Typography 
+              variant="h4" 
+              component="h1" 
+              gutterBottom 
+              fontWeight={600}
+              sx={{ fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem' } }}
+            >
               Xác thực Email
             </Typography>
-            <Typography variant="body1" color="text.secondary">
+            <Typography 
+              variant="body1" 
+              color="text.secondary"
+              sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
+            >
               Nhập địa chỉ email của bạn để nhận mã OTP
             </Typography>
           </Box>
 
           <form onSubmit={handleSubmit}>
-            <Box sx={{ mb: 3 }}>
+            <Box sx={{ mb: { xs: 2, sm: 3 } }}>
               <TextField
                 fullWidth
                 type="email"
@@ -94,18 +115,21 @@ export default function EmailReset() {
                   '& .MuiOutlinedInput-root': {
                     borderRadius: 2,
                   },
+                  '& .MuiInputBase-input': {
+                    fontSize: { xs: '0.875rem', sm: '1rem' },
+                  },
                 }}
               />
             </Box>
 
             {error && (
-              <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
+              <Alert severity="error" sx={{ mb: { xs: 2, sm: 3 }, borderRadius: 2 }}>
                 {error}
               </Alert>
             )}
 
             {success && (
-              <Alert severity="success" sx={{ mb: 3, borderRadius: 2 }}>
+              <Alert severity="success" sx={{ mb: { xs: 2, sm: 3 }, borderRadius: 2 }}>
                 Mã OTP đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư!
               </Alert>
             )}
@@ -119,8 +143,8 @@ export default function EmailReset() {
               endIcon={loading ? <CircularProgress size={20} color="inherit" /> : <Send />}
               sx={{
                 borderRadius: 2,
-                padding: 1.5,
-                fontSize: '1rem',
+                padding: { xs: 1.2, sm: 1.5 },
+                fontSize: { xs: '0.875rem', sm: '1rem' },
                 fontWeight: 600,
                 background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                 '&:hover': {
@@ -132,8 +156,12 @@ export default function EmailReset() {
             </Button>
           </form>
 
-          <Box sx={{ mt: 3, textAlign: 'center' }}>
-            <Typography variant="caption" color="text.secondary">
+          <Box sx={{ mt: { xs: 2, sm: 3 }, textAlign: 'center' }}>
+            <Typography 
+              variant="caption" 
+              color="text.secondary"
+              sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+            >
               Bạn sẽ nhận được email chứa mã OTP trong vài phút
             </Typography>
           </Box>
