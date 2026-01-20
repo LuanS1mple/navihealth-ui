@@ -1,6 +1,9 @@
 import { Box, Typography, Avatar, Badge, IconButton } from "@mui/material";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import MenuIcon from '@mui/icons-material/Menu';
+import { useState, useEffect } from "react";
+import requestApi from "../../apis/apis";
+import { GET_ME } from "../../constants/apis";
 
 export default function TopHeader(props) {
   const today = new Date().toLocaleDateString("vi-VN", {
@@ -9,6 +12,26 @@ export default function TopHeader(props) {
     month: "long",
     year: "numeric"
   });
+
+  const [user, setUser] = useState({
+    username: "Khách",
+    id: null
+  });
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await requestApi(GET_ME, 'GET');
+        if (response && response.data) {
+          setUser(response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   return (
     <Box
@@ -41,7 +64,7 @@ export default function TopHeader(props) {
           <Typography
             sx={{ fontSize: { xs: 18, md: 22 }, fontWeight: 600, color: "#1e73be" }}
           >
-            Xin chào, Nguyễn Văn A 👋
+            Xin chào, {user.username} 👋
           </Typography>
 
           <Typography sx={{ color: "text.secondary", mt: 0.3 }}>
@@ -58,7 +81,9 @@ export default function TopHeader(props) {
           </Badge>
         </IconButton>
 
-        <Avatar sx={{ bgcolor: "#90caf9" }}>NV</Avatar>
+        <Avatar sx={{ bgcolor: "#90caf9" }}>
+          {user.username ? user.username.charAt(0).toUpperCase() : "U"}
+        </Avatar>
       </Box>
     </Box>
   );

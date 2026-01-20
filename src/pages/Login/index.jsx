@@ -12,17 +12,36 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import requestApi from "../../apis/apis";
+import { useNavigate } from "react-router-dom";
+import { CircularProgress } from "@mui/material";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  const handleLogin = () => {
-    requestApi('auth/login','POST', {
-      username: email,
-      password: password
-    })
+  const handleLogin = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      await requestApi('auth/login', 'POST', {
+        username: email,
+        password: password
+      });
+      navigate('/health-records');
+    } catch (err) {
+      console.error(err);
+      if (err.response?.data?.error === "Unauthorized") {
+        setError("Email hoặc mật khẩu không đúng. Vui lòng nhập lại.");
+      } else {
+        setError("Đăng nhập thất bại. Vui lòng thử lại sau.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleGoogleLogin = () => {
@@ -35,11 +54,11 @@ export default function Login() {
   };
 
   const handleForgotPassword = () => {
-    window.location.href = 'http://localhost:5173/email'
+    navigate('/email')
   };
 
   const handleRegister = () => {
-    console.log("Register clicked");
+    navigate('/register')
   };
 
   return (
@@ -110,6 +129,12 @@ export default function Login() {
               >
                 Đăng nhập
               </Typography>
+
+              {error && (
+                <Typography color="error" variant="body2" align="center" sx={{ fontFamily: "Arimo, Helvetica, sans-serif" }}>
+                  {error}
+                </Typography>
+              )}
 
               <Stack spacing={{ xs: 2, sm: 2.5, md: 2.5 }}>
                 <Box>
@@ -244,6 +269,7 @@ export default function Login() {
                   fullWidth
                   variant="contained"
                   onClick={handleLogin}
+                  disabled={loading}
                   sx={{
                     height: { xs: "40px", sm: "42px", md: "44px" },
                     backgroundColor: "#004aad",
@@ -257,7 +283,7 @@ export default function Login() {
                     },
                   }}
                 >
-                  Đăng nhập
+                  {loading ? <CircularProgress size={24} color="inherit" /> : "Đăng nhập"}
                 </Button>
 
                 <Box sx={{ textAlign: "center" }}>

@@ -10,7 +10,10 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import requestApi from "../../apis/apis";
+import { CircularProgress } from "@mui/material";
 
 const formFields = [
   {
@@ -44,7 +47,6 @@ const formFields = [
     id: "confirmPassword",
   },
 ];
-
 const socialButtons = [
   {
     name: "Google",
@@ -75,6 +77,7 @@ const socialButtons = [
 ];
 
 const Register = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     fullname: "",
     email: "",
@@ -83,6 +86,8 @@ const Register = () => {
     confirmPassword: "",
   });
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleInputChange = (id) => (event) => {
     setFormData({ ...formData, [id]: event.target.value });
@@ -92,8 +97,49 @@ const Register = () => {
     setAgreedToTerms(event.target.checked);
   };
 
-  const handleRegister = () => {
-    console.log("Register clicked", formData);
+  const validateForm = () => {
+    if (!formData.fullname || !formData.email || !formData.password || !formData.confirmPassword) {
+      setError("Vui lòng điền đầy đủ thông tin");
+      return false;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError("Email không đúng định dạng");
+      return false;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("Mật khẩu xác nhận không khớp");
+      return false;
+    }
+
+    if (!agreedToTerms) {
+      setError("Vui lòng đồng ý với điều khoản dịch vụ");
+      return false;
+    }
+
+    setError("");
+    return true;
+  };
+
+  const handleRegister = async () => {
+    if (!validateForm()) return;
+
+    setLoading(true);
+    try {
+      await requestApi("auth/register", "POST", {
+        username: formData.fullname,
+        email: formData.email,
+        password: formData.password
+      });
+      navigate("/login");
+    } catch (err) {
+      console.error(err);
+      setError(err.response?.data?.message || "Đăng ký thất bại, vui lòng thử lại");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSocialLogin = (provider) => () => {
@@ -101,34 +147,34 @@ const Register = () => {
   };
 
   const handleBackToHome = () => {
-    console.log("Back to home");
+    navigate('/login')
   };
 
   const handleLoginNow = () => {
-    console.log("Login now");
+    navigate('/login')
   };
 
   return (
     <Box
       sx={{
         width: "100vw",
-        height: "100vh",
+        minHeight: "100vh",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         backgroundImage: "url(https://www.lechodesarenes.com/wp-content/uploads/2021/04/Du-bon-usage-du-numerique_article_full.jpg)",
         backgroundSize: "cover",
+        py: 4,
       }}
     >
-      <Stack spacing={3} sx={{ position: "relative", zIndex: 1, width: 448 }}>
+      <Stack spacing={3} sx={{ position: "relative", zIndex: 1, width: "100%", maxWidth: 448, px: 2 }}>
         <Box
           sx={{
             backgroundColor: "rgba(255, 255, 255, 0.95)",
             borderRadius: "20px",
             boxShadow:
               "0px 4px 6px -4px rgba(0, 0, 0, 0.1), 0px 10px 15px -3px rgba(0, 0, 0, 0.1)",
-            padding: "32px",
-            paddingBottom: "32px",
+            p: { xs: 3, sm: 4 },
           }}
         >
           <Stack spacing={2}>
@@ -145,26 +191,32 @@ const Register = () => {
                 justifyContent: 'space-between'
               }}
             >
-               <Button
-                  startIcon={<ArrowBackIcon />}
-                  onClick={handleBackToHome}
-                  sx={{
-                    alignSelf: "flex-start",
-                    color: "#519db1",
-                    textTransform: "none",
-                    fontFamily: "Arimo-Regular, Helvetica",
-                    fontSize: 14,
-                    padding: 0,
-                    minWidth: "auto",
-                    "&:hover": {
-                      backgroundColor: "transparent",
-                    },
-                  }}
-                >
+              <Button
+                startIcon={<ArrowBackIcon />}
+                onClick={handleBackToHome}
+                sx={{
+                  alignSelf: "flex-start",
+                  color: "#519db1",
+                  textTransform: "none",
+                  fontFamily: "Arimo-Regular, Helvetica",
+                  fontSize: 14,
+                  padding: 0,
+                  minWidth: "auto",
+                  "&:hover": {
+                    backgroundColor: "transparent",
+                  },
+                }}
+              >
                 Quay lại trang chủ
               </Button>
               Đăng ký tài khoản
             </Typography>
+
+            {error && (
+              <Typography color="error" variant="body2" align="center" sx={{ fontFamily: "Arimo-Regular, Helvetica" }}>
+                {error}
+              </Typography>
+            )}
 
             <Stack spacing={2.5}>
               {formFields.map((field) => (
@@ -266,6 +318,7 @@ const Register = () => {
                 variant="contained"
                 fullWidth
                 onClick={handleRegister}
+                disabled={loading}
                 sx={{
                   height: 44,
                   backgroundColor: "#004aad",
@@ -279,7 +332,7 @@ const Register = () => {
                   },
                 }}
               >
-                Đăng ký
+                {loading ? <CircularProgress size={24} color="inherit" /> : "Đăng ký"}
               </Button>
 
               <Box sx={{ textAlign: "center" }}>

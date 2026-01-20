@@ -20,7 +20,8 @@ import {
   Grid,
   Modal,
   Backdrop,
-  Fade
+  Fade,
+  CircularProgress
 } from '@mui/material';
 
 import {
@@ -34,8 +35,9 @@ import {
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import BackHandIcon from '@mui/icons-material/BackHand';
 
+
 import requestApi from '../../../apis/apis'
-import { UPLOAD_API, SAVE_RECORD, GET_RECORDS } from '../../../constants/apis';
+import { UPLOAD_API, SAVE_RECORD, GET_RECORDS, DETAIL_RECORD } from '../../../constants/apis';
 
 function HealthRecordList() {
 
@@ -44,9 +46,15 @@ function HealthRecordList() {
   ======================= */
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   const [confirmData, setConfirmData] = useState(null);
+
   const [showConfirm, setShowConfirm] = useState(false);
+
+  // View Modal State
+  const [viewData, setViewData] = useState(null);
+  const [showView, setShowView] = useState(false);
 
   /* =======================
      FETCH RECORDS (FIXED)
@@ -68,28 +76,69 @@ function HealthRecordList() {
         setLoading(false);
       }
     };
-
     fetchRecords();
   }, []);
+
+  const fetchRecords = async () => {
+    setLoading(true);
+    try {
+      const response = await requestApi(GET_RECORDS, 'GET');
+      if (response.status === 200) {
+        setRecords(response.data);
+      } else {
+        setRecords([]);
+      }
+    } catch (err) {
+      console.error(err);
+      setRecords([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   /* =======================
      HANDLERS
   ======================= */
-  const handleView = (id) => {
-    console.log('View record:', id);
+  const handleView = async (id) => {
+    setUploading(true); // Re-use uploading loading state or create new one
+    try {
+      const response = await requestApi(`${DETAIL_RECORD}${id}`, 'GET');
+      setViewData(response.data); // Assuming response.data is the JSON record
+      setShowView(true);
+    } catch (error) {
+      console.error("Error viewing record:", error);
+      alert("Không thể tải chi tiết hồ sơ");
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleEdit = (id) => {
     console.log('Edit record:', id);
   };
 
-  const handleDelete = (id) => {
-    console.log('Delete record:', id);
+  const handleDelete = async (id) => {
+    if (!window.confirm("Bạn có chắc chắn muốn xóa hồ sơ này không?")) return;
+
+    setUploading(true);
+    try {
+      await requestApi(`${DETAIL_RECORD}${id}`, 'DELETE');
+      alert("Đã xóa hồ sơ thành công");
+      fetchRecords(); // Refresh list
+    } catch (error) {
+      console.error("Error deleting record:", error);
+      alert("Xóa hồ sơ thất bại");
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleUpload = async () => {
     try {
       const uploadedImage = await getImage();
+      if (!uploadedImage) return;
+
+      setUploading(true);
       const formData = new FormData();
       formData.append("files", uploadedImage);
 
@@ -104,6 +153,9 @@ function HealthRecordList() {
       setShowConfirm(true);
     } catch (e) {
       console.error(e);
+      alert("Lỗi khi tải ảnh hoặc phân tích dữ liệu");
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -120,6 +172,11 @@ function HealthRecordList() {
 
   const handleEditConfirm = () => {
     setShowConfirm(false);
+  };
+
+  const handleCloseView = () => {
+    setShowView(false);
+    setViewData(null);
   };
 
   /* =======================
@@ -343,21 +400,123 @@ function HealthRecordList() {
         ))}
       </Box>
 
+      {/* ===== LOADING BACKDROP ===== */}
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1, flexDirection: 'column', gap: 2 }}
+        open={uploading}
+      >
+        <CircularProgress color="inherit" />
+        <Typography variant="h6" component="div">
+          Đang xử lý dữ liệu...
+        </Typography>
+      </Backdrop>
+
       {/* ===== CONFIRM MODAL ===== */}
       <Modal
         open={showConfirm}
         onClose={handleEditConfirm}
         closeAfterTransition
-        slots={{ backdrop: Backdrop }}
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
       >
         <Fade in={showConfirm}>
-          <Box sx={{ p: 2 }}>
+          <Box
+            sx={{
+              width: { xs: '95%', sm: '90%', md: '80%' },
+              maxWidth: 1000,
+              maxHeight: '90vh',
+              bgcolor: 'background.paper',
+              borderRadius: 3,
+              boxShadow: 24,
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column'
+            }}
+          >
             {confirmData && (
-              <ConfirmRecord
-                data={confirmData.data}
-                onConfirm={handleConfirmSave}
-                onEdit={handleEditConfirm}
-              />
+              <>
+                <Box sx={{ overflowY: 'auto', p: 0, flex: 1 }}>
+                  <ConfirmRecord
+                    data={confirmData.data}
+                  />
+                </Box>
+
+                {/* Fixed Footer Actions */}
+                <Box sx={{
+                  p: 2,
+                  borderTop: '1px solid #e5e7eb',
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  gap: 2,
+                  bgcolor: 'background.paper'
+                }}>
+                  <Button variant="outlined" onClick={handleEditConfirm}>
+                    Quay lại
+                  </Button>
+                  <Button
+                    variant="contained"
+                    sx={{ bgcolor: "#2563eb" }}
+                    onClick={handleConfirmSave}
+                  >
+                    Xác nhận lưu hồ sơ
+                  </Button>
+                </Box>
+              </>
+            )}
+          </Box>
+        </Fade>
+      </Modal>
+
+      {/* ===== VIEW MODAL ===== */}
+      <Modal
+        open={showView}
+        onClose={handleCloseView}
+        closeAfterTransition
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+      >
+        <Fade in={showView}>
+          <Box
+            sx={{
+              width: { xs: '95%', sm: '90%', md: '80%' },
+              maxWidth: 1000,
+              maxHeight: '90vh',
+              bgcolor: 'background.paper',
+              borderRadius: 3,
+              boxShadow: 24,
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column'
+            }}
+          >
+            {viewData && (
+              <>
+                <Box sx={{ overflowY: 'auto', p: 0, flex: 1 }}>
+                  <ConfirmRecord
+                    data={viewData}
+                  />
+                </Box>
+
+                {/* Fixed Footer Actions for View */}
+                <Box sx={{
+                  p: 2,
+                  borderTop: '1px solid #e5e7eb',
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  gap: 2,
+                  bgcolor: 'background.paper'
+                }}>
+                  <Button variant="outlined" onClick={handleCloseView}>
+                    Đóng
+                  </Button>
+                </Box>
+              </>
             )}
           </Box>
         </Fade>

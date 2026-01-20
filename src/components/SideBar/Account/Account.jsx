@@ -1,11 +1,33 @@
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Box, Avatar, Typography, Button } from "@mui/material";
 import LogoutIcon from "@mui/icons-material/Logout";
 import requestApi from '../../../apis/apis';
+import { GET_ME } from '../../../constants/apis';
 function Account({ dimension }) {
   // eslint-disable-next-line no-unused-vars
   const { sideBarWidth } = dimension
+
+  const [user, setUser] = useState({
+    username: "Khách",
+    email: ""
+  });
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await requestApi(GET_ME, 'GET');
+        if (response && response.data) {
+          setUser(response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
   var logoutHandle = () => {
     requestApi('auth/logout', 'POST')
     localStorage.removeItem('accessToken')
@@ -40,7 +62,7 @@ function Account({ dimension }) {
               boxShadow: "0 4px 10px rgba(144, 202, 249, 0.3)"
             }}
           >
-            NV
+            {user.username ? user.username.charAt(0).toUpperCase() : "U"}
           </Avatar>
 
           <Box sx={{ flex: 1, minWidth: 0 }}>
@@ -54,7 +76,7 @@ function Account({ dimension }) {
                 whiteSpace: 'nowrap'
               }}
             >
-              Nguyễn Văn A
+              {user.username}
             </Typography>
             <Typography
               sx={{
@@ -65,7 +87,7 @@ function Account({ dimension }) {
                 whiteSpace: 'nowrap'
               }}
             >
-              nguyenvana@email.com
+              {user.email}
             </Typography>
           </Box>
         </Box>

@@ -182,18 +182,6 @@ function HealthRecord({ record, onView, onEdit, onDelete }) {
               size="small"
               sx={{
                 width: '36px', height: '36px', borderRadius: '10px',
-                bgcolor: '#f8fafc', border: '1px solid #e2e8f0',
-                '&:hover': { bgcolor: '#f0fdf4', borderColor: '#bbf7d0', color: '#16a34a' }
-              }}
-              onClick={() => onEdit(record.id)}
-            >
-              <Edit size={18} />
-            </IconButton>
-
-            <IconButton
-              size="small"
-              sx={{
-                width: '36px', height: '36px', borderRadius: '10px',
                 bgcolor: '#fef2f2', border: '1px solid #fee2e2',
                 '&:hover': { bgcolor: '#fee2e2', borderColor: '#fca5a5' }
               }}

@@ -149,6 +149,22 @@ function RenderValue({ value }) {
   }
 
   // string / number
+  if (typeof value === "string") {
+    // Try parse JSON if it looks like object/array
+    const trimmed = value.trim();
+    if ((trimmed.startsWith("{") && trimmed.endsWith("}")) ||
+      (trimmed.startsWith("[") && trimmed.endsWith("]"))) {
+      try {
+        const parsed = JSON.parse(value);
+        if (typeof parsed === "object" && parsed !== null) {
+          return <RenderValue value={parsed} />;
+        }
+      } catch (e) {
+        // ignore parsing error, render as string
+      }
+    }
+  }
+
   return (
     <Typography sx={{ whiteSpace: "pre-wrap" }}>
       {String(value)}
@@ -183,7 +199,7 @@ function DynamicSection({ title, data }) {
 /* =========================
    MAIN COMPONENT
 ========================= */
-function ConfirmRecord({ data, onConfirm, onEdit }) {
+function ConfirmRecord({ data }) {
   let parsedData = data;
 
   // nếu backend trả string JSON
@@ -206,15 +222,13 @@ function ConfirmRecord({ data, onConfirm, onEdit }) {
   return (
     <Card
       sx={{
-        maxWidth: 900,
-        mx: "auto",
-        my: 4,
-        borderRadius: 3,
-        border: "1px solid #e5e7eb",
-        boxShadow: "none"
+        borderRadius: 0,
+        border: "none",
+        boxShadow: "none",
+        height: "100%"
       }}
     >
-      <CardContent sx={{ p: 4 }}>
+      <CardContent sx={{ p: { xs: 2, md: 4 } }}>
         {/* HEADER */}
         <Typography
           textAlign="center"
@@ -226,6 +240,8 @@ function ConfirmRecord({ data, onConfirm, onEdit }) {
           XÁC NHẬN HỒ SƠ Y TẾ
         </Typography>
 
+        <Divider sx={{ mb: 4 }} />
+
         {/* DYNAMIC CONTENT */}
         {Object.entries(parsedData).map(([key, value]) => (
           <DynamicSection
@@ -236,18 +252,6 @@ function ConfirmRecord({ data, onConfirm, onEdit }) {
         ))}
 
         {/* ACTIONS */}
-        <Box mt={4} display="flex" justifyContent="flex-end" gap={2}>
-          <Button variant="outlined" onClick={onEdit}>
-            Quay lại
-          </Button>
-          <Button
-            variant="contained"
-            sx={{ bgcolor: "#2563eb" }}
-            onClick={onConfirm}
-          >
-            Xác nhận lưu hồ sơ
-          </Button>
-        </Box>
       </CardContent>
     </Card>
   );
