@@ -1,15 +1,12 @@
-import { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
-  Drawer,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Avatar,
   Box,
   Typography,
-  Button,
   Divider,
 } from '@mui/material';
 import {
@@ -22,116 +19,121 @@ import {
   Feedback,
   Logout,
 } from '@mui/icons-material';
-import Logo from '../SideBar/Logo/Logo'
-import Account from '../SideBar/Account/Account'
-function SideBar({ onClose }) {
-  const menuItems = [
-    { text: 'Trang chủ', icon: Home, active: true },
-    { text: 'Hồ sơ sức khỏe', icon: Description, active: false },
-    { text: 'AI Sức khỏe', icon: Psychology, active: false },
-    { text: 'Quản lý nhắc nhở', icon: NotificationsActive, active: false },
-    { text: 'Gói dịch vụ', icon: ShoppingBag, active: false },
-    { text: 'Trợ giúp / Hỗ trợ', icon: HelpOutline, active: false },
-    { text: 'Phản hồi', icon: Feedback, active: false },
-  ];
-  const sideBarWidth = '250px'
-  const logoHeight = '80px'
-  const [activeItem, setActiveItem] = useState(0);
-  return (
-    <>
-      <Box
-        sx={{
-          width: '100%',
-          flexShrink: 0,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexDirection: 'column',
-          height: '100vh',
-          position: 'sticky',
-          top: 0,
-          backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#1a1a1a' : '#f8f9fa',
-          borderRight: (theme) => `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)'}`,
-          transition: 'background-color 0.3s ease',
-          overflowY: 'auto'
-        }}
-      >
-        <Box>
-          <Logo dimension={{ sideBarWidth, logoHeight }} />
-          <Box sx={{ flexGrow: 1, pt: 2, px: 2 }}>
-            <List sx={{ p: 0 }}>
-              {menuItems.map((item, index) => {
-                const IconComponent = item.icon;
-                const isActive = index === activeItem;
+import Logo from './Logo/Logo';
+import Account from './Account/Account';
 
-                return (
-                  <ListItem key={index} disablePadding sx={{ mb: 0.5 }}>
-                    <ListItemButton
-                      onClick={() => {
-                        setActiveItem(index);
-                        if (onClose) onClose();
-                      }}
-                      sx={{
-                        borderRadius: '12px',
-                        height: 48,
-                        backgroundColor: isActive
-                          ? '#004aad'
-                          : (theme) => theme.palette.mode === 'dark'
-                            ? 'rgba(255, 255, 255, 0.05)'
-                            : 'rgba(0, 74, 173, 0.04)',
-                        '&:hover': {
-                          backgroundColor: isActive
-                            ? '#004aad'
-                            : (theme) => theme.palette.mode === 'dark'
-                              ? 'rgba(255, 255, 255, 0.1)'
-                              : 'rgba(0, 74, 173, 0.08)',
-                        },
-                        boxShadow: isActive
-                          ? '0px 4px 12px rgba(0, 74, 173, 0.25)'
-                          : 'none',
-                        transition: 'all 0.3s ease',
-                      }}
-                    >
-                      <ListItemIcon sx={{ minWidth: 32 }}>
-                        <IconComponent
-                          sx={{
-                            fontSize: 20,
-                            color: isActive
-                              ? '#ffffff'
-                              : (theme) => theme.palette.mode === 'dark'
-                                ? 'rgba(255, 255, 255, 0.7)'
-                                : '#4a5565',
-                            transition: 'color 0.3s ease',
-                          }}
-                        />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={item.text}
-                        primaryTypographyProps={{
-                          fontSize: 16,
-                          fontWeight: isActive ? 600 : 400,
-                          color: isActive
-                            ? '#ffffff'
-                            : (theme) => theme.palette.mode === 'dark'
-                              ? 'rgba(255, 255, 255, 0.87)'
-                              : '#4a5565',
-                          lineHeight: '24px',
-                          transition: 'color 0.3s ease',
-                        }}
-                      />
-                    </ListItemButton>
-                  </ListItem>
-                );
-              })}
-            </List>
-          </Box>
-        </Box>
-        <Box sx={{ width: '100%', p: 2, boxSizing: 'border-box' }}>
-          <Account dimension={{ sideBarWidth, logoHeight }} />
-        </Box>
+function SideBar({ onClose }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const menuItems = [
+    { text: 'Trang chủ', icon: Home, path: '/main' },
+    { text: 'Hồ sơ sức khỏe', icon: Description, path: '/health-records' },
+    { text: 'AI Sức khỏe', icon: Psychology, path: '/chatbot' },
+    { text: 'Quản lý nhắc nhở', icon: NotificationsActive, path: '/reminders' },
+    { text: 'Gói dịch vụ', icon: ShoppingBag, path: '/services' },
+    { text: 'Trợ giúp / Hỗ trợ', icon: HelpOutline, path: '/support' },
+    { text: 'Phản hồi', icon: Feedback, path: '/feedback' },
+  ];
+
+  return (
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      {/* Container Logo */}
+      <Box sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Logo dimension={{ sideBarWidth: 260, logoHeight: 80 }} />
       </Box>
-    </>
-  )
+
+      {/* Menu Options */}
+      <Box sx={{ flexGrow: 1, px: 2, mt: 2 }}>
+        <List sx={{ p: 0 }}>
+          {menuItems.map((item, index) => {
+            const IconComponent = item.icon;
+            const isActive = location.pathname === item.path;
+
+            return (
+              <ListItem key={index} disablePadding sx={{ mb: 1 }}>
+                <ListItemButton
+                  onClick={() => {
+                    navigate(item.path);
+                    if (onClose) onClose();
+                  }}
+                  sx={{
+                    borderRadius: '12px',
+                    py: 1.2,
+                    px: 2,
+                    background: isActive
+                      ? 'linear-gradient(135deg, rgba(81, 157, 177, 0.1) 0%, rgba(0, 74, 173, 0.1) 100%)'
+                      : 'transparent',
+                    color: isActive ? '#004aad' : '#64748b',
+                    position: 'relative',
+                    '&::before': isActive ? {
+                      content: '""',
+                      position: 'absolute',
+                      left: 0,
+                      top: '20%',
+                      height: '60%',
+                      width: '4px',
+                      backgroundColor: '#004aad',
+                      borderRadius: '0 4px 4px 0',
+                    } : {},
+                    '&:hover': {
+                      backgroundColor: 'rgba(0, 74, 173, 0.05)',
+                      color: '#004aad',
+                      '& .MuiListItemIcon-root': { color: '#004aad' }
+                    },
+                  }}
+                >
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 40,
+                      color: isActive ? '#004aad' : '#94a3b8',
+                      transition: 'all 0.3s ease'
+                    }}
+                  >
+                    <IconComponent fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={item.text}
+                    primaryTypographyProps={{
+                      fontSize: '14px',
+                      fontWeight: isActive ? 600 : 500,
+                    }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            );
+          })}
+        </List>
+      </Box>
+
+      <Divider sx={{ mx: 2, opacity: 0.5 }} />
+
+      {/* Footer / Account Section */}
+      <Box sx={{ p: 2 }}>
+        <ListItemButton
+          onClick={() => {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            navigate('/login');
+          }}
+          sx={{
+            mt: 1,
+            borderRadius: '12px',
+            color: '#ef4444',
+            '&:hover': { bgcolor: 'rgba(239, 68, 68, 0.05)' }
+          }}
+        >
+          <ListItemIcon sx={{ minWidth: 40, color: 'inherit' }}>
+            <Logout fontSize="small" />
+          </ListItemIcon>
+          <ListItemText
+            primary="Đăng xuất"
+            primaryTypographyProps={{ fontSize: '14px', fontWeight: 600 }}
+          />
+        </ListItemButton>
+      </Box>
+    </Box>
+  );
 }
 
-export default SideBar
+export default SideBar;

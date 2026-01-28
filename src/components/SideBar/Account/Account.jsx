@@ -4,9 +4,9 @@ import { Box, Avatar, Typography, Button } from "@mui/material";
 import LogoutIcon from "@mui/icons-material/Logout";
 import requestApi from '../../../apis/apis';
 import { GET_ME } from '../../../constants/apis';
-function Account({ dimension }) {
+function Account({ dimension = {} }) {
   // eslint-disable-next-line no-unused-vars
-  const { sideBarWidth } = dimension
+  const { sideBarWidth = '260px' } = dimension
 
   const [user, setUser] = useState({
     username: "Khách",

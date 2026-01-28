@@ -1,311 +1,434 @@
-import React from 'react'
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
-  Container,
   Typography,
   TextField,
-  Button,
   Paper,
   Avatar,
   IconButton,
+  CircularProgress,
+  Fade,
+  InputAdornment,
+  Tooltip,
 } from '@mui/material';
-import AddIcon  from '@mui/icons-material/Add';
 import SendIcon from '@mui/icons-material/Send';
-import SideBar from '../../../components/SideBar/SideBar';
-import TopHeader from '../../../components/HeadBar/HeadBar';
-import { SparklesIcon, UserIcon   } from 'lucide-react';
+import {
+  Sparkles as SparklesIcon,
+  User as UserIcon,
+  Paperclip,
+  Zap,
+  Info
+} from 'lucide-react';
+import requestApi from '../../../apis/apis';
+import {
+  CHAT,
+  GET_CONVERSATIONS,
+  GET_CHAT_HISTORY,
+} from '../../../constants/apis';
+import ConversationList from './ConversationList';
+
 function ChatBot() {
-  const [message, setMessage] = React.useState('');
-  const [messages, setMessages] = React.useState([
-    {
-      id: 1,
-      type: 'user',
-      text: 'Bạn có thể giúp gì cho tôi?',
-      time: '10:00',
-    },
-    {
-      id: 2,
-      type: 'ai',
-      text: `Xin chào! Tôi là trợ lý AI Sức khỏe của NAVI HEALTH. Tôi có thể giúp bạn
-            Hãy cho tôi biết bạn cần hỗ trợ gì nhé!`,
-      time: '10:00',
-    },
-  ]);
-    const handleSendMessage = () => {
-    if (message.trim()) {
+  const [message, setMessage] = useState('');
+  const [messages, setMessages] = useState([]);
+  const [conversations, setConversations] = useState([]);
+  const [currentConvoId, setCurrentConvoId] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [fetchingHistory, setFetchingHistory] = useState(false);
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, loading]);
+
+  useEffect(() => {
+    fetchConversations();
+  }, []);
+
+  useEffect(() => {
+    if (currentConvoId) {
+      fetchHistory(currentConvoId);
+    } else {
       setMessages([
-        ...messages,
         {
-          id: messages.length + 1,
-          type: 'user',
-          text: message,
-          time: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
+          role: 'assistant',
+          content: 'Xin chào! Tôi là trợ lý AI Sức khỏe chuyên biệt của NAVI HEALTH. Tôi đã nắm được thông tin sức khỏe của bạn. Bạn cần tôi tư vấn điều gì hôm nay?',
+          createdAt: new Date(),
         },
       ]);
-      setMessage('');
+    }
+  }, [currentConvoId]);
+
+  const fetchConversations = async () => {
+    try {
+      const response = await requestApi(GET_CONVERSATIONS, 'GET');
+      if (response && response.data) {
+        setConversations(response.data);
+      }
+    } catch (error) {
+      console.error('Error:', error);
     }
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
+  const fetchHistory = async (id) => {
+    setFetchingHistory(true);
+    try {
+      const response = await requestApi(`${GET_CHAT_HISTORY}${id}`, 'GET');
+      if (response && response.data) {
+        setMessages(response.data);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setFetchingHistory(false);
     }
   };
+
+  const handleSendMessage = async () => {
+    if (!message.trim() || loading) return;
+
+    const userMsgText = message;
+    const userMessage = {
+      role: 'user',
+      content: userMsgText,
+      createdAt: new Date(),
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+    setMessage('');
+    setLoading(true);
+
+    try {
+      const response = await requestApi(CHAT, 'POST', {
+        conversationId: currentConvoId,
+        message: userMsgText,
+      });
+
+      if (response && response.data) {
+        const aiMessage = {
+          role: 'assistant',
+          content: response.data.reply,
+          createdAt: new Date(),
+        };
+        setMessages((prev) => [...prev, aiMessage]);
+
+        if (!currentConvoId) {
+          const newId = response.data.conversationId;
+          setCurrentConvoId(newId);
+          fetchConversations();
+        } else if (messages.length <= 2) {
+          fetchConversations();
+        }
+      }
+    } catch (error) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: 'Xin lỗi, kết nối tới hệ thống AI đang gặp gián đoạn. Vui lòng thử lại sau giây lát.',
+          createdAt: new Date(),
+        },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleNewChat = () => {
+    setCurrentConvoId(null);
+    setMessages([
+      {
+        role: 'assistant',
+        content: 'Xin chào! Tôi là trợ lý AI Sức khỏe của NAVI HEALTH. Tôi có thể giúp gì cho bạn hôm nay?',
+        createdAt: new Date(),
+      },
+    ]);
+  };
+
+  const handleDeleteChat = async (id) => {
+    try {
+      await requestApi(`${CHAT}/${id}`, 'DELETE');
+      if (currentConvoId === id) handleNewChat();
+      fetchConversations();
+    } catch (error) {
+      alert('Lỗi khi xóa cuộc trò chuyện');
+    }
+  };
+
   return (
-    <>
-        <Box sx={{display: 'flex'}}>
-          <SideBar/>
-          <Box>
-            <TopHeader/>
+    <Box
+      className="page-transition"
+      sx={{
+        display: 'flex',
+        height: 'calc(100vh - 120px)',
+        borderRadius: '24px',
+        overflow: 'hidden',
+        boxShadow: '0 20px 60px rgba(0, 74, 173, 0.1)',
+        bgcolor: 'white',
+        border: '1px solid rgba(134, 203, 222, 0.2)',
+      }}
+    >
+      <ConversationList
+        conversations={conversations}
+        currentId={currentConvoId}
+        onSelect={setCurrentConvoId}
+        onNewChat={handleNewChat}
+        onDelete={handleDeleteChat}
+      />
+
+      <Box
+        sx={{
+          flexGrow: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          bgcolor: '#fff',
+          position: 'relative',
+        }}
+      >
+        {/* Chat Header / Info Bar */}
+        <Box
+          sx={{
+            p: 2,
+            borderBottom: '1px solid rgba(134, 203, 222, 0.1)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            bgcolor: 'rgba(255, 255, 255, 0.8)',
+            backdropFilter: 'blur(10px)',
+            zIndex: 2
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Avatar
+              sx={{
+                width: 40,
+                height: 40,
+                background: 'linear-gradient(135deg, #519db1 0%, #004aad 100%)',
+                boxShadow: '0 4px 10px rgba(0, 74, 173, 0.2)'
+              }}
+            >
+              <Zap size={20} fill="white" />
+            </Avatar>
             <Box>
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  height: '100vh',
-                  background: 'linear-gradient(180deg, #f0f9fb 0%, #ffffff 50%, #e8f4f8 100%)'
-                }}
-              >
-                {/* Header */}
-                <Box
-                  sx={{
-                    py: 2,
-                    px: 4,
-                  }}
-                >
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, backgroundColor: '#519db1 0%'}}>
-                      <Avatar
-                        sx={{
-                          width: 40,
-                          height: 40,
-                          background: 'linear-gradient(180deg, #519db1 0%, #004aad 100%)',
-                        }}
-                      >
-                        <SparklesIcon size={24} />
-                      </Avatar>
-                      <Box>
-                        <Typography
-                          sx={{
-                            fontFamily: 'Arimo, sans-serif',
-                            fontWeight: 700,
-                            fontSize: '16px',
-                            lineHeight: '24px',
-                            color: '#004aad',
-                          }}
-                        >
-                          AI Sức khỏe
-                        </Typography>
-                        <Typography
-                          sx={{
-                            fontFamily: 'Arimo, sans-serif',
-                            fontWeight: 400,
-                            fontSize: '12px',
-                            lineHeight: '16px',
-                            color: '#6a7282',
-                          }}
-                        >
-                          Trợ lý chăm sóc sức khỏe thông minh
-                        </Typography>
-                      </Box>
-                    </Box>
-
-                    <Button
-                      variant="contained"
-                      startIcon={<AddIcon size={16} />}
-                      sx={{
-                        background: 'linear-gradient(180deg, #519db1 0%, #004aad 100%)',
-                        borderRadius: '12px',
-                        textTransform: 'none',
-                        fontFamily: 'Arimo, sans-serif',
-                        fontSize: '14px',
-                        px: 3,
-                        py: 1,
-                        '&:hover': {
-                          background: 'linear-gradient(180deg, #5aadc1 0%, #1159bd 100%)',
-                        },
-                      }}
-                    >
-                      Trò chuyện mới
-                    </Button>
-                  </Box>
-                </Box>
-
-                {/* Chat Messages */}
-                <Box
-                  sx={{
-                    flex: 1,
-                    overflow: 'auto',
-                    px: 3,
-                    py: 3,
-                  }}
-                >
-                  <Container maxWidth="md">
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                      {messages.map((msg) => (
-                        <Box
-                          key={msg.id}
-                          sx={{
-                            display: 'flex',
-                            justifyContent: msg.type === 'user' ? 'flex-end' : 'flex-start',
-                            gap: 1,
-                            alignItems: 'flex-start',
-                          }}
-                        >
-                          {msg.type === 'ai' && (
-                            <Avatar
-                              sx={{
-                                width: 32,
-                                height: 32,
-                                background: 'linear-gradient(180deg, #519db1 0%, #004aad 100%)',
-                              }}
-                            >
-                              <SparklesIcon size={16} />
-                            </Avatar>
-                          )}
-
-                          <Paper
-                            elevation={0}
-                            sx={{
-                              maxWidth: msg.type === 'ai' ? '768px' : '70%',
-                              p: msg.type === 'ai' ? '13px 17px' : '12px 16px',
-                              background:
-                                msg.type === 'user'
-                                  ? 'linear-gradient(180deg, #519db1 0%, #004aad 100%)'
-                                  : 'white',
-                              color: msg.type === 'user' ? 'white' : '#0a0a0a',
-                              border:
-                                msg.type === 'user' ? 'none' : '1px solid rgba(134, 203, 222, 0.3)',
-                              borderRadius: '16px',
-                            }}
-                          >
-                            <Typography
-                              sx={{
-                                fontFamily: 'Arimo, sans-serif',
-                                fontSize: '14px',
-                                lineHeight: '22.75px',
-                                whiteSpace: 'pre-line',
-                                mb: 1,
-                              }}
-                            >
-                              {msg.text}
-                            </Typography>
-                            <Typography
-                              sx={{
-                                fontFamily: 'Arimo, sans-serif',
-                                fontSize: '12px',
-                                lineHeight: '16px',
-                                color: msg.type === 'user' ? 'rgba(255, 255, 255, 0.7)' : '#99a1af',
-                              }}
-                            >
-                              {msg.time}
-                            </Typography>
-                          </Paper>
-
-                          {msg.type === 'user' && (
-                            <Avatar
-                              sx={{
-                                width: 32,
-                                height: 32,
-                                bgcolor: 'rgba(135, 199, 236, 0.2)',
-                              }}
-                            >
-                              <UserIcon size={16} />
-                            </Avatar>
-                          )}
-                        </Box>
-                      ))}
-                    </Box>
-                  </Container>
-                </Box>
-
-                {/* Input Area */}
-                <Paper
-                  sx={{
-                    px: 3,
-                    py: '17px',
-                    background: 'linear-gradient(180deg, #f0f9fb 0%, #ffffff 50%, #e8f4f8 100%)',
-                  }}
-                >
-                  <Container maxWidth="md" >
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                      <Box sx={{ position: 'relative' }}>
-                        <TextField
-                          fullWidth
-                          multiline
-                          maxRows={3}
-                          value={message}
-                          onChange={(e) => setMessage(e.target.value)}
-                          onKeyPress={handleKeyPress}
-                          placeholder="Hỏi bất cứ điều gì về sức khỏe..."
-                          sx={{
-                            '& .MuiOutlinedInput-root': {
-                              borderRadius: '16px',
-                              fontFamily: 'Arimo, sans-serif',
-                              fontSize: '14px',
-                              paddingRight: '48px',
-                            },
-                            
-                          }}
-                        />
-                        <IconButton
-                          onClick={handleSendMessage}
-                          disabled={!message.trim()}
-                          sx={{
-                            position: 'absolute',
-                            right: 8,
-                            top: '50%',
-                            transform: 'translateY(-50%)',
-                            background: message.trim()
-                              ? 'linear-gradient(180deg, #519db1 0%, #004aad 100%)'
-                              : '#e0e0e0',
-                            width: 32,
-                            height: 32,
-                            '&:hover': {
-                              background: message.trim()
-                                ? 'linear-gradient(180deg, #5aadc1 0%, #1159bd 100%)'
-                                : '#e0e0e0',
-                            },
-                            '&:disabled': {
-                              color: 'rgba(0, 0, 0, 0.26)',
-                              background: '#e0e0e0',
-                            },
-                          }}
-                        >
-                          <SendIcon sx={{paddingLeft: 0.5}} size={16} />
-                        </IconButton>
-                      </Box>
-
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '4px',
-                        }}
-                      >
-                        <Typography
-                          sx={{
-                            fontFamily: 'Arimo, sans-serif',
-                            fontSize: '12px',
-                            lineHeight: '16px',
-                            color: '#6a7282',
-                            textAlign: 'center',
-                          }}
-                        >
-                          AI có thể mắc lỗi. Vui lòng kiểm tra thông tin quan trọng với bác sĩ.
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </Container>
-                </Paper>
-              </Box>   
+              <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#004aad', lineHeight: 1.2 }}>
+                NAVI HEALTH AI
+              </Typography>
+              <Typography variant="caption" sx={{ color: '#10b981', display: 'flex', alignItems: 'center', gap: 0.5, fontWeight: 600 }}>
+                <Box sx={{ width: 6, height: 6, bgcolor: '#10b981', borderRadius: '50%' }} />
+                Đang trực tuyến
+              </Typography>
             </Box>
           </Box>
+          <Tooltip title="AI được cá nhân hóa dựa trên hồ sơ sức khỏe của bạn">
+            <IconButton size="small"><Info size={16} color="#94a3b8" /></IconButton>
+          </Tooltip>
+        </Box>
+
+        {/* Messages Container */}
+        <Box
+          sx={{
+            flex: 1,
+            overflowY: 'auto',
+            p: { xs: 2, md: 4 },
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 3,
+            background: 'radial-gradient(circle at 50% 50%, rgba(81, 157, 177, 0.02) 0%, transparent 100%)',
+          }}
+        >
+          {fetchingHistory ? (
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 10, gap: 2 }}>
+              <CircularProgress size={24} sx={{ color: '#519db1' }} />
+              <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 500 }}>Đang tải lịch sử trò chuyện...</Typography>
+            </Box>
+          ) : (
+            <>
+              {messages.map((msg, index) => (
+                <Fade in={true} key={index} timeout={400}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start',
+                      gap: 2,
+                      alignItems: 'flex-start',
+                    }}
+                  >
+                    {msg.role !== 'user' && (
+                      <Avatar
+                        sx={{
+                          width: 32,
+                          height: 32,
+                          background: 'linear-gradient(135deg, #519db1 0%, #004aad 100%)',
+                          boxShadow: '0 2px 8px rgba(0, 74, 173, 0.1)'
+                        }}
+                      >
+                        <SparklesIcon size={16} color="white" />
+                      </Avatar>
+                    )}
+
+                    <Box sx={{ maxWidth: '75%', display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                      <Paper
+                        elevation={0}
+                        sx={{
+                          p: '14px 20px',
+                          background:
+                            msg.role === 'user'
+                              ? 'linear-gradient(135deg, #519db1 0%, #004aad 100%)'
+                              : '#f8fafc',
+                          color: msg.role === 'user' ? '#fff' : '#1e293b',
+                          borderRadius: msg.role === 'user' ? '20px 20px 4px 20px' : '20px 20px 20px 4px',
+                          boxShadow: msg.role === 'user' ? '0 4px 15px rgba(0, 74, 173, 0.15)' : 'none',
+                          border: msg.role === 'user' ? 'none' : '1px solid rgba(134, 203, 222, 0.15)',
+                        }}
+                      >
+                        <Typography
+                          sx={{
+                            fontSize: '14.5px',
+                            lineHeight: 1.6,
+                            fontWeight: msg.role === 'user' ? 500 : 400,
+                            letterSpacing: '0.01em'
+                          }}
+                        >
+                          {msg.content}
+                        </Typography>
+                      </Paper>
+                      <Typography
+                        sx={{
+                          fontSize: '10px',
+                          color: '#94a3b8',
+                          textAlign: msg.role === 'user' ? 'right' : 'left',
+                          px: 1,
+                          fontWeight: 600
+                        }}
+                      >
+                        {new Date(msg.createdAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+                      </Typography>
+                    </Box>
+
+                    {msg.role === 'user' && (
+                      <Avatar
+                        sx={{
+                          width: 32,
+                          height: 32,
+                          bgcolor: 'rgba(0, 74, 173, 0.05)',
+                          border: '1px solid rgba(0, 74, 173, 0.1)'
+                        }}
+                      >
+                        <UserIcon size={16} color="#004aad" />
+                      </Avatar>
+                    )}
+                  </Box>
+                </Fade>
+              ))}
+              {loading && (
+                <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+                  <Avatar
+                    sx={{
+                      width: 32,
+                      height: 32,
+                      background: 'linear-gradient(135deg, #519db1 0%, #004aad 100%)',
+                    }}
+                  >
+                    <SparklesIcon size={16} color="white" />
+                  </Avatar>
+                  <Paper
+                    sx={{
+                      p: '16px 20px',
+                      bgcolor: '#f8fafc',
+                      borderRadius: '20px 20px 20px 4px',
+                      display: 'flex',
+                      gap: 1
+                    }}
+                  >
+                    <Box className="typing-dot" sx={{ width: 6, height: 6, bgcolor: '#519db1', borderRadius: '50%', animation: 'bounce 1.4s infinite ease-in-out' }} />
+                    <Box className="typing-dot" sx={{ width: 6, height: 6, bgcolor: '#519db1', borderRadius: '50%', animation: 'bounce 1.4s infinite ease-in-out', animationDelay: '0.2s' }} />
+                    <Box className="typing-dot" sx={{ width: 6, height: 6, bgcolor: '#519db1', borderRadius: '50%', animation: 'bounce 1.4s infinite ease-in-out', animationDelay: '0.4s' }} />
+                  </Paper>
+                </Box>
+              )}
+              <div ref={messagesEndRef} />
+            </>
+          )}
+        </Box>
+
+        {/* Improved Input Area */}
+        <Box sx={{ p: { xs: 2, md: 3 }, bgcolor: 'white' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'flex-end',
+              gap: 1.5,
+              p: 1.5,
+              borderRadius: '20px',
+              bgcolor: '#f8fafc',
+              border: '1px solid rgba(134, 203, 222, 0.2)',
+              transition: 'all 0.3s ease',
+              '&:focus-within': {
+                borderColor: '#519db1',
+                boxShadow: '0 0 0 4px rgba(81, 157, 177, 0.05)',
+                bgcolor: '#fff'
+              }
+            }}
+          >
+            <IconButton size="small" sx={{ color: '#94a3b8', mb: 0.5 }}><Paperclip size={20} /></IconButton>
+            <TextField
+              fullWidth
+              multiline
+              maxRows={6}
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSendMessage();
+                }
+              }}
+              placeholder="Hỏi AI về kết quả xét nghiệm hoặc tư vấn sức khỏe..."
+              variant="standard"
+              InputProps={{
+                disableUnderline: true,
+                sx: {
+                  fontSize: '14.5px',
+                  fontFamily: 'Arimo, sans-serif',
+                  py: 1
+                }
+              }}
+              disabled={loading}
+            />
+            <IconButton
+              onClick={handleSendMessage}
+              disabled={!message.trim() || loading}
+              sx={{
+                mb: 0.5,
+                background: 'linear-gradient(135deg, #519db1 0%, #004aad 100%)',
+                color: 'white',
+                width: 40,
+                height: 40,
+                '&:hover': { transform: 'scale(1.05)', opacity: 0.9 },
+                '&:disabled': { background: '#e2e8f0', color: '#94a3b8' },
+              }}
+            >
+              {loading ? <CircularProgress size={20} color="inherit" /> : <SendIcon sx={{ fontSize: 20 }} />}
+            </IconButton>
+          </Box>
+          <Typography variant="caption" sx={{ display: 'block', textAlign: 'center', mt: 1.5, color: '#94a3b8', fontSize: '10px' }}>
+            Thông tin từ AI chỉ mang tính chất tham khảo. Luôn tham vấn chuyên gia y tế cho các quyết định chẩn đoán.
+          </Typography>
+        </Box>
       </Box>
-    </>
-  )
+
+      {/* Add Bounce Animation locally if needed, but I'll add it to index.css too */}
+      <style>{`
+        @keyframes bounce {
+          0%, 80%, 100% { transform: scale(0); }
+          40% { transform: scale(1.0); }
+        }
+      `}</style>
+    </Box>
+  );
 }
 
-export default ChatBot
+export default ChatBot;

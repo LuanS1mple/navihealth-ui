@@ -45,7 +45,7 @@ export const HeadBar = () => {
 
           <Typography
             sx={{
-              fontFamily: "'Arimo-Bold', Helvetica",
+
               fontWeight: 700,
               color: "#004aad",
               fontSize: "30px",
@@ -80,7 +80,7 @@ export const HeadBar = () => {
             />
             <Typography
               sx={{
-                fontFamily: "'Arimo-Regular', Helvetica",
+
                 fontWeight: 400,
                 color: "#495565",
                 fontSize: "16px",
@@ -106,7 +106,7 @@ export const HeadBar = () => {
           >
             <Typography
               sx={{
-                fontFamily: "'Arimo-Regular', Helvetica",
+
                 fontWeight: 400,
                 color: "#519db1",
                 fontSize: "16px",
@@ -134,7 +134,7 @@ export const HeadBar = () => {
           >
             <Typography
               sx={{
-                fontFamily: "'Arimo-Regular', Helvetica",
+
                 fontWeight: 400,
                 color: "white",
                 fontSize: "16px",

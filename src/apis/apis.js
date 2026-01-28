@@ -1,5 +1,5 @@
 import axios from "axios";
-import { DOMAIN_API } from "../constants/apis";
+import { DOMAIN_API, LOGIN } from "../constants/apis";
 export default function requestApi(endpoint, method, body, responseType = 'json') {
   const headers = {
     'Accept': 'application/json',
@@ -34,9 +34,9 @@ export default function requestApi(endpoint, method, body, responseType = 'json'
       const originConfig = error.config
       if (originConfig._retry) {
         return Promise.reject(error)
-      } 
+      }
       console.log("Access Token is expired")
-      if (error.response && error.response.status === 401) {
+      if (error.response && error.response.status === 401 && endpoint !== LOGIN) {
         try {
           console.log("Call refreshToken")
           const result = await refreshClient.post(
@@ -49,10 +49,10 @@ export default function requestApi(endpoint, method, body, responseType = 'json'
           originConfig.headers['Authorization'] = `Bearer ${accessToken}`
           return instance(originConfig)
         } catch (error) {
-          if (error.response && error.response.status === 401) {
+          if (error.response || error.response.status === 401) {
             localStorage.removeItem('accessToken')
             localStorage.removeItem('refreshToken')
-            window.location.href = 'http://localhost:5173/login'
+            window.location.href = 'http://222.255.180.18/login'
           }
           return Promise.reject(error)
         }
@@ -66,7 +66,7 @@ export default function requestApi(endpoint, method, body, responseType = 'json'
     data: body,
     responseType: responseType,
     headers: body instanceof FormData
-    ? undefined
-    : { 'Content-Type': 'application/json'}
+      ? undefined
+      : { 'Content-Type': 'application/json' }
   })
 }

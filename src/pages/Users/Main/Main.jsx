@@ -124,7 +124,7 @@ function Main() {
   ];
   return (
     <>
-      <Box>
+      <Box sx={{ width: '100%' }}>
         {/* Quick Info Section */}
         <Box sx={{ mb: 4 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
@@ -140,12 +140,19 @@ function Main() {
               Xem chi tiết
             </Button>
           </Box>
-          <Grid container spacing={2}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, width: '100%' }}>
             {healthStats.map((stat, index) => (
-              <Grid item xs={12} sm={6} md={3} key={index}>
+              <Box
+                key={index}
+                sx={{
+                  width: { xs: '100%', sm: 'calc(50% - 8px)', md: 'calc(25% - 12px)' },
+                  flexGrow: 1
+                }}
+              >
                 <Card
                   sx={{
                     width: '100%',
+                    height: '100%',
                     borderRadius: '16px',
                     boxShadow: '0px 4px 6px -1px rgba(0,0,0,0.1), 0px 2px 4px -2px rgba(0,0,0,0.1)',
                   }}
@@ -184,15 +191,15 @@ function Main() {
                     />
                   </CardContent>
                 </Card>
-              </Grid>
+              </Box>
             ))}
-          </Grid>
+          </Box>
         </Box>
 
-        {/* Two Column Layout */}
-        <Grid container spacing={2}>
-          {/* Left Column - Reminders */}
-          <Grid item xs={12} md={6}>
+        {/* Two Column Layout: Reminders & Appointments */}
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, width: '100%' }}>
+          {/* Reminders Section */}
+          <Box sx={{ flexGrow: 1, width: { xs: '100%', md: 'calc(50% - 8px)' } }}>
             <Card
               sx={{
                 borderRadius: '16px',
@@ -268,10 +275,10 @@ function Main() {
                 </Box>
               </CardContent>
             </Card>
-          </Grid>
+          </Box>
 
-          {/* Right Column - Appointments */}
-          <Grid item xs={12} md={6}>
+          {/* Appointments Section */}
+          <Box sx={{ flexGrow: 1, width: { xs: '100%', md: 'calc(50% - 8px)' } }}>
             <Card
               sx={{
                 borderRadius: '16px',
@@ -330,14 +337,14 @@ function Main() {
                 </Box>
               </CardContent>
             </Card>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
 
         {/* Premium Service Card */}
         <Box sx={{ mt: 3 }}>
           <Typography sx={{ color: '#004aad', fontSize: 16, mb: 2 }}>Gói dịch vụ</Typography>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3, width: '100%' }}>
+            <Box sx={{ flexGrow: 1, width: { xs: '100%', md: 'calc(50% - 12px)' } }}>
               <Card
                 sx={{
                   borderRadius: '16px',
@@ -363,8 +370,9 @@ function Main() {
                   </Typography>
                 </CardContent>
               </Card>
-            </Grid>
-            <Grid item xs={12} md={6}>
+            </Box>
+
+            <Box sx={{ flexGrow: 1, width: { xs: '100%', md: 'calc(50% - 12px)' } }}>
               <Card
                 sx={{
                   borderRadius: '16px',
@@ -390,8 +398,8 @@ function Main() {
                   </Typography>
                 </CardContent>
               </Card>
-            </Grid>
-          </Grid>
+            </Box>
+          </Box>
         </Box>
       </Box>
     </>

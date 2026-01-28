@@ -7,202 +7,89 @@ import {
 const appTheme = createTheme({
   palette: {
     primary: {
-      main: "rgba(0, 74, 173, 1)",
-      light: "rgba(81, 157, 177, 1)",
-      dark: "rgba(0, 74, 173, 1)",
+      main: "#004aad",
+      light: "#519db1",
+      dark: "#003a8a",
+      contrastText: "#ffffff",
     },
     secondary: {
-      main: "rgba(81, 157, 177, 1)",
-      light: "rgba(135, 199, 236, 1)",
-      dark: "rgba(81, 157, 177, 1)",
+      main: "#519db1",
+      light: "#86cbde",
+      dark: "#3d7a8a",
     },
     background: {
-      default: "rgba(255, 255, 255, 1)",
-      paper: "rgba(255, 255, 255, 1)",
+      default: "#f8fafc",
+      paper: "#ffffff",
     },
     text: {
-      primary: "rgba(73, 85, 101, 1)",
-      secondary: "rgba(153, 161, 174, 1)",
-      disabled: "rgba(105, 114, 130, 1)",
+      primary: "#1e293b",
+      secondary: "#64748b",
+      disabled: "#94a3b8",
     },
-    grey: {
-      50: "rgba(249, 250, 251, 1)",
-      100: "rgba(229, 231, 235, 1)",
-      200: "rgba(229, 231, 235, 1)",
-      300: "rgba(209, 213, 219, 1)",
-      400: "rgba(156, 163, 175, 1)",
-      500: "rgba(107, 114, 128, 1)",
-      600: "rgba(75, 85, 99, 1)",
-      700: "rgba(55, 65, 81, 1)",
-      800: "rgba(31, 41, 55, 1)",
-      900: "rgba(17, 24, 39, 1)",
-    },
-    info: {
-      main: "rgba(135, 199, 236, 1)",
-      light: "rgba(135, 199, 236, 0.2)",
-      dark: "rgba(81, 157, 177, 1)",
-    },
-    success: {
-      main: "rgba(81, 157, 177, 1)",
-    },
-    white: "rgba(255, 255, 255, 1)",
-    blue: {
-      main: "rgba(0, 74, 173, 1)",
-      light: "rgba(81, 157, 177, 1)",
-      lighter: "rgba(135, 199, 236, 1)",
-      lightest: "rgba(135, 199, 236, 0.2)",
-    },
-    teal: {
-      main: "rgba(81, 157, 177, 1)",
-      light: "rgba(134, 203, 222, 1)",
-    },
-    border: {
-      main: "rgba(134, 203, 222, 0.3)",
-      light: "rgba(81, 157, 177, 0.3)",
-    },
-    overlay: {
-      white: "rgba(255, 255, 255, 0.8)",
-      whiteLight: "rgba(255, 255, 255, 0.6)",
-      whiteLighter: "rgba(255, 255, 255, 0.2)",
-    },
-    gradient: {
-      primary:
-        "linear-gradient(180deg, rgba(81, 157, 177, 1) 0%, rgba(0, 74, 173, 1) 100%)",
-      background:
-        "linear-gradient(180deg, rgba(240, 249, 251, 1) 0%, rgba(255, 255, 255, 1) 50%, rgba(232, 244, 248, 1) 100%)",
-      benefits:
-        "linear-gradient(117deg, rgba(81, 157, 177, 0.05) 0%, rgba(135, 199, 236, 0.1) 100%)",
-    },
+    divider: "rgba(134, 203, 222, 0.2)",
   },
   typography: {
-    fontFamily: "'Arimo', 'Helvetica', 'Arial', sans-serif",
-    h1: {
-      fontSize: "32px",
-      fontWeight: 700,
-      lineHeight: "48px",
-      letterSpacing: "0",
-    },
-    h2: {
-      fontSize: "24px",
-      fontWeight: 700,
-      lineHeight: "36px",
-      letterSpacing: "0",
-    },
-    h3: {
-      fontSize: "20px",
-      fontWeight: 700,
-      lineHeight: "30px",
-      letterSpacing: "0",
-    },
-    h4: {
-      fontSize: "16px",
-      fontWeight: 700,
-      lineHeight: "24px",
-      letterSpacing: "0",
-    },
-    body1: {
-      fontSize: "16px",
-      fontWeight: 400,
-      lineHeight: "24px",
-      letterSpacing: "0",
-    },
-    body2: {
-      fontSize: "14px",
-      fontWeight: 400,
-      lineHeight: "20px",
-      letterSpacing: "0",
-    },
-    subtitle1: {
-      fontSize: "16px",
-      fontWeight: 400,
-      lineHeight: "24px",
-      letterSpacing: "0",
-    },
-    subtitle2: {
-      fontSize: "14px",
-      fontWeight: 400,
-      lineHeight: "20px",
-      letterSpacing: "0",
-    },
-    caption: {
-      fontSize: "12px",
-      fontWeight: 400,
-      lineHeight: "16px",
-      letterSpacing: "0",
-    },
-    button: {
-      fontSize: "14px",
-      fontWeight: 400,
-      lineHeight: "20px",
-      letterSpacing: "0",
-      textTransform: "none",
-    },
+    fontFamily: "'Be Vietnam Pro', 'Inter', 'Arimo', sans-serif",
+    h1: { fontSize: "2.5rem", fontWeight: 700, letterSpacing: "-0.02em" },
+    h2: { fontSize: "2rem", fontWeight: 700, letterSpacing: "-0.01em" },
+    h3: { fontSize: "1.5rem", fontWeight: 600 },
+    h4: { fontSize: "1.25rem", fontWeight: 600 },
+    h5: { fontSize: "1.1rem", fontWeight: 600 },
+    h6: { fontSize: "1rem", fontWeight: 600 },
+    body1: { fontSize: "1rem", lineHeight: 1.6 },
+    body2: { fontSize: "0.875rem", lineHeight: 1.6 },
+    button: { textTransform: "none", fontWeight: 500 },
+  },
+  shape: {
+    borderRadius: 16,
   },
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
-          textTransform: "none",
-          borderRadius: "16px",
-          padding: "8px 16px",
+          borderRadius: 12,
+          padding: "10px 24px",
+          transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
         },
         contained: {
-          background:
-            "linear-gradient(180deg, rgba(81, 157, 177, 1) 0%, rgba(0, 74, 173, 1) 100%)",
-          color: "rgba(255, 255, 255, 1)",
-          boxShadow: "none",
+          background: "linear-gradient(135deg, #519db1 0%, #004aad 100%)",
+          boxShadow: "0 4px 12px rgba(0, 74, 173, 0.2)",
           "&:hover": {
-            boxShadow: "none",
+            boxShadow: "0 6px 16px rgba(0, 74, 173, 0.3)",
+            transform: "translateY(-1px)",
           },
         },
-        outlined: {
-          borderColor: "rgba(81, 157, 177, 1)",
-          color: "rgba(81, 157, 177, 1)",
-          backgroundColor: "rgba(255, 255, 255, 1)",
-        },
       },
     },
-    MuiCssBaseline: {
+    MuiPaper: {
       styleOverrides: {
-        body: {
-          margin: 0,
-          padding: 0,
-          boxSizing: "border-box",
+        root: {
+          backgroundImage: "none",
+          boxShadow: "0 4px 20px rgba(0, 0, 0, 0.04)",
+        },
+      },
+    },
+    MuiDrawer: {
+      styleOverrides: {
+        paper: {
+          border: "none",
+          boxShadow: "4px 0 24px rgba(0, 0, 0, 0.02)",
+        },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          "& .MuiOutlinedInput-root": {
+            borderRadius: 12,
+            backgroundColor: "#f8fafc",
+            "& fieldset": { borderColor: "rgba(134, 203, 222, 0.3)" },
+            "&:hover fieldset": { borderColor: "#519db1" },
+          },
         },
       },
     },
   },
-  shape: {
-    borderRadius: 8,
-  },
-  shadows: [
-    "none",
-    "0px 25px 50px -12px rgba(0, 0, 0, 0.25)",
-    "0px 8px 10px -6px rgba(0, 0, 0, 0.1), 0px 20px 25px -5px rgba(0, 0, 0, 0.1)",
-    "0px 4px 6px -4px rgba(0, 0, 0, 0.1), 0px 10px 15px -3px rgba(0, 0, 0, 0.1)",
-    "0px 4px 6px -4px rgba(0, 0, 0, 0.1), 0px 10px 15px -3px rgba(0, 0, 0, 0.1)",
-    "0px 4px 6px -4px rgba(0, 0, 0, 0.1), 0px 10px 15px -3px rgba(0, 0, 0, 0.1)",
-    "0px 4px 6px -4px rgba(0, 0, 0, 0.1), 0px 10px 15px -3px rgba(0, 0, 0, 0.1)",
-    "0px 4px 6px -4px rgba(0, 0, 0, 0.1), 0px 10px 15px -3px rgba(0, 0, 0, 0.1)",
-    "0px 4px 6px -4px rgba(0, 0, 0, 0.1), 0px 10px 15px -3px rgba(0, 0, 0, 0.1)",
-    "0px 4px 6px -4px rgba(0, 0, 0, 0.1), 0px 10px 15px -3px rgba(0, 0, 0, 0.1)",
-    "0px 4px 6px -4px rgba(0, 0, 0, 0.1), 0px 10px 15px -3px rgba(0, 0, 0, 0.1)",
-    "0px 4px 6px -4px rgba(0, 0, 0, 0.1), 0px 10px 15px -3px rgba(0, 0, 0, 0.1)",
-    "0px 4px 6px -4px rgba(0, 0, 0, 0.1), 0px 10px 15px -3px rgba(0, 0, 0, 0.1)",
-    "0px 4px 6px -4px rgba(0, 0, 0, 0.1), 0px 10px 15px -3px rgba(0, 0, 0, 0.1)",
-    "0px 4px 6px -4px rgba(0, 0, 0, 0.1), 0px 10px 15px -3px rgba(0, 0, 0, 0.1)",
-    "0px 4px 6px -4px rgba(0, 0, 0, 0.1), 0px 10px 15px -3px rgba(0, 0, 0, 0.1)",
-    "0px 4px 6px -4px rgba(0, 0, 0, 0.1), 0px 10px 15px -3px rgba(0, 0, 0, 0.1)",
-    "0px 4px 6px -4px rgba(0, 0, 0, 0.1), 0px 10px 15px -3px rgba(0, 0, 0, 0.1)",
-    "0px 4px 6px -4px rgba(0, 0, 0, 0.1), 0px 10px 15px -3px rgba(0, 0, 0, 0.1)",
-    "0px 4px 6px -4px rgba(0, 0, 0, 0.1), 0px 10px 15px -3px rgba(0, 0, 0, 0.1)",
-    "0px 4px 6px -4px rgba(0, 0, 0, 0.1), 0px 10px 15px -3px rgba(0, 0, 0, 0.1)",
-    "0px 4px 6px -4px rgba(0, 0, 0, 0.1), 0px 10px 15px -3px rgba(0, 0, 0, 0.1)",
-    "0px 4px 6px -4px rgba(0, 0, 0, 0.1), 0px 10px 15px -3px rgba(0, 0, 0, 0.1)",
-    "0px 4px 6px -4px rgba(0, 0, 0, 0.1), 0px 10px 15px -3px rgba(0, 0, 0, 0.1)",
-    "0px 4px 6px -4px rgba(0, 0, 0, 0.1), 0px 10px 15px -3px rgba(0, 0, 0, 0.1)",
-    "0px 4px 6px -4px rgba(0, 0, 0, 0.1), 0px 10px 15px -3px rgba(0, 0, 0, 0.1)",
-  ],
 });
 
 export const ThemeProvider = ({ children }) => {

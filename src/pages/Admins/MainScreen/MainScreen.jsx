@@ -1,15 +1,6 @@
 import React from 'react'
-import SideBarAdmin from '../SideBar/SideBarAdmin'
 import {
   Box,
-  Drawer,
-  AppBar,
-  Toolbar,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
   Typography,
   Card,
   CardContent,
@@ -20,21 +11,20 @@ import {
   Button,
   Container,
   Divider,
-  Badge as MuiBadge
+  List,
+  ListItem
 } from '@mui/material';
 import {
-  Dashboard,
   People,
   Description,
   AttachMoney,
   TrendingUp,
-  Person,
   Article,
   SmartToy,
-  Payments,
   ArrowForward,
   CheckCircle
 } from '@mui/icons-material';
+
 function MainScreen() {
   const stats = [
     {
@@ -70,12 +60,14 @@ function MainScreen() {
       iconColor: '#F79009'
     },
   ];
+
   const quickActions = [
     { id: 'users', text: 'Quản lý người dùng', icon: <People /> },
     { id: 'records', text: 'Quản lý hồ sơ', icon: <Description /> },
     { id: 'revenue', text: 'Quản lý doanh thu', icon: <AttachMoney /> },
-    { id: 'settings', text: 'Cài đặt hệ thống', icon: <Dashboard /> },
+    { id: 'settings', text: 'Cài đặt hệ thống', icon: <TrendingUp /> },
   ];
+
   const newUsers = [
     { name: 'Nguyễn Văn A', email: 'nguyenvana@gmail.com', status: 'Hoạt động', badge: 'Premium 3 tháng' },
     { name: 'Trần Thị B', email: 'tranb@gmail.com', status: 'Hoạt động', badge: 'Premium 1 tháng' },
@@ -83,6 +75,7 @@ function MainScreen() {
     { name: 'Phạm Thị D', email: 'phamd@gmail.com', status: 'Không hoạt động', badge: 'Premium 6 tháng' },
     { name: 'Hoàng Văn E', email: 'hoange@gmail.com', status: 'Hoạt động', badge: 'Premium 1 tháng' },
   ];
+
   const recentRecords = [
     { title: 'Xét nghiệm máu', user: 'Nguyễn Văn A', status: 'Đã duyệt', date: '2024-11-01 14:30' },
     { title: 'Đơn thuốc', user: 'Trần Thị B', status: 'Đã duyệt', date: '2024-11-01 11:20' },
@@ -92,273 +85,106 @@ function MainScreen() {
   ];
 
   return (
-    <>
-      <Box sx={{
-        display: 'flex',
-        width: '100vw'
-      }}>
-        <SideBarAdmin />
-        <Box
-          sx={{
-            width:'100%',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center'
-          }}
-        >
-          {/* Header */}
-          <Box
-            sx={{
-              bgcolor: 'white',
-              borderBottom: '1px solid #E5E7EB',
-              p: 2,
-              width: '100%'
-            }}
-          >
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Box>
-                <Typography variant="h5" fontWeight="bold" color="#101828" gutterBottom>
-                  Tổng quan hệ thống
-                </Typography>
-                <Typography variant="body2" color="#4A5565">
-                  Theo dõi và quản lý toàn bộ hoạt động NAVI HEALTH
-                </Typography>
-              </Box>
-              <Chip
-                icon={<CheckCircle sx={{ fontSize: 16 }} />}
-                label="Hệ thống hoạt động tốt"
-                sx={{
-                  bgcolor: '#F0FDF4',
-                  color: '#00A63E',
-                  border: '1px solid #B9F8CF',
-                  fontWeight: 'normal',
-                }}
-              />
-            </Box>
-          </Box>
-
-          {/* Content */}
-          <Container maxWidth="xl" sx={{ py: 4 }}>
-            {/* Stats Cards */}
-            <Grid  sx={{ display: 'flex', justifyContent: 'space-around', marginBottom: 3 }}>
-              {stats.map((stat, index) => (
-                <Grid sx={{width: '23%'}} item xs={12} sm={6} md={3} key={index}>
-                  <Card sx={{ borderRadius: '16px', border: '1px solid #E5E7EB' }}>
-                    <CardContent>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                        <Box
-                          sx={{
-                            width: 48,
-                            height: 48,
-                            borderRadius: '12px',
-                            bgcolor: stat.color,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: stat.iconColor,
-                          }}
-                        >
-                          {stat.icon}
-                        </Box>
-                        <Chip
-                          icon={<TrendingUp sx={{ fontSize: 14 }} />}
-                          label={stat.change}
-                          size="small"
-                          sx={{
-                            bgcolor: '#F0FDF4',
-                            color: '#00A63E',
-                            border: '1px solid #B9F8CF',
-                            height: 22,
-                          }}
-                        />
-                      </Box>
-                      <Typography variant="body2" color="#4A5565" gutterBottom>
-                        {stat.title}
-                      </Typography>
-                      <Typography variant="h4" fontWeight="bold" color="#101828">
-                        {stat.value}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-
-            {/* Quick Actions */}
-            <Box sx={{ mb: 3,ml: 1.5, borderRadius: '16px', border: '1px solid #E5E7EB', width: '96%', p: 2 }}>
-              <Typography variant="h6" fontWeight="bold" color="#101828" gutterBottom>
-                Thao tác nhanh
-              </Typography>
-              <Typography variant="body2" color="#4A5565" sx={{ mb: 2 }}>
-                Truy cập các chức năng quản lý chính
-              </Typography>
-              <Grid sx={{display: 'flex', justifyContent: 'space-between'}}>
-                {quickActions.map((action) => (
-                  <Grid sx={{width: '24%'}} item xs={12} sm={6} md={3} key={action.id}>
-                    <Button
-                      fullWidth
-                      variant="outlined"
-                      startIcon={action.icon}
-                      endIcon={<ArrowForward />}
-                      sx={{
-                        justifyContent: 'space-between',
-                        p: 2,
-                        borderRadius: '12px',
-                        border: '1px solid #E5E7EB',
-                        color: '#364153',
-                        fontWeight: 'bold',
-                        textTransform: 'none',
-                        '&:hover': {
-                          bgcolor: '#F9FAFB',
-                          border: '1px solid #E5E7EB',
-                        },
-                      }}
-                    >
-                      {action.text}
-                    </Button>
-                  </Grid>
-                ))}
-              </Grid>
-            </Box>
-
-            {/* Lists */}
-            <Grid sx={{display: 'flex', justifyContent: 'space-between', ml: 1.5, pr: 2}} >
-              {/* New Users */}
-              <Grid sx={{width: '49%'}} item xs={12} md={6}>
-                <Paper sx={{ p: 3, borderRadius: '16px', border: '1px solid #E5E7EB' }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                    <Box>
-                      <Typography variant="h6" fontWeight="bold" color="#101828">
-                        Người dùng mới
-                      </Typography>
-                      <Typography variant="body2" color="#4A5565">
-                        5 người dùng đăng ký gần nhất
-                      </Typography>
-                    </Box>
-                    <Button size="small" endIcon={<ArrowForward />}>
-                      Xem tất cả
-                    </Button>
-                  </Box>
-                  <List>
-                    {newUsers.map((user, index) => (
-                      <React.Fragment key={index}>
-                        {index > 0 && <Divider />}
-                        <ListItem sx={{ py: 2, px: 0 }}>
-                          <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                            <Avatar
-                              sx={{
-                                bgcolor: '#155DFC',
-                                mr: 2,
-                                width: 40,
-                                height: 40,
-                              }}
-                            >
-                              {user.name.charAt(0)}
-                            </Avatar>
-                            <Box sx={{ flexGrow: 1 }}>
-                              <Typography variant="body2" fontWeight="bold" color="#101828">
-                                {user.name}
-                              </Typography>
-                              <Typography variant="caption" color="#6A7282">
-                                {user.email}
-                              </Typography>
-                            </Box>
-                            <Box sx={{ textAlign: 'right' }}>
-                              <Chip
-                                label={user.status}
-                                size="small"
-                                sx={{
-                                  bgcolor: user.status === 'Hoạt động' ? '#F0FDF4' : '#FEF3F2',
-                                  color: user.status === 'Hoạt động' ? '#00A63E' : '#D92D20',
-                                  fontSize: '12px',
-                                  height: 20,
-                                  mb: 0.5,
-                                }}
-                              />
-                              <Typography variant="caption" display="block" color="#6A7282">
-                                {user.badge}
-                              </Typography>
-                            </Box>
-                          </Box>
-                        </ListItem>
-                      </React.Fragment>
-                    ))}
-                  </List>
-                </Paper>
-              </Grid>
-
-              {/* Recent Records */}
-              <Grid sx={{width: '49%'}} item xs={12} md={6}>
-                <Paper sx={{ p: 3, borderRadius: '16px', border: '1px solid #E5E7EB' }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                    <Box>
-                      <Typography variant="h6" fontWeight="bold" color="#101828">
-                        Hồ sơ mới nhất
-                      </Typography>
-                      <Typography variant="body2" color="#4A5565">
-                        Hồ sơ được upload gần đây
-                      </Typography>
-                    </Box>
-                    <Button size="small" endIcon={<ArrowForward />}>
-                      Xem tất cả
-                    </Button>
-                  </Box>
-                  <List>
-                    {recentRecords.map((record, index) => (
-                      <React.Fragment key={index}>
-                        {index > 0 && <Divider />}
-                        <ListItem sx={{ py: 2, px: 0 }}>
-                          <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                            <Box
-                              sx={{
-                                width: 40,
-                                height: 40,
-                                borderRadius: '8px',
-                                bgcolor: '#EFF6FF',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                mr: 2,
-                              }}
-                            >
-                              <Article sx={{ color: '#155DFC', fontSize: 20 }} />
-                            </Box>
-                            <Box sx={{ flexGrow: 1 }}>
-                              <Typography variant="body2" fontWeight="bold" color="#101828">
-                                {record.title}
-                              </Typography>
-                              <Typography variant="caption" color="#6A7282">
-                                {record.user}
-                              </Typography>
-                            </Box>
-                            <Box sx={{ textAlign: 'right' }}>
-                              <Chip
-                                label={record.status}
-                                size="small"
-                                sx={{
-                                  bgcolor: record.status === 'Đã duyệt' ? '#F0FDF4' : '#FEF3F2',
-                                  color: record.status === 'Đã duyệt' ? '#00A63E' : '#F79009',
-                                  fontSize: '12px',
-                                  height: 20,
-                                  mb: 0.5,
-                                }}
-                              />
-                              <Typography variant="caption" display="block" color="#6A7282">
-                                {record.date}
-                              </Typography>
-                            </Box>
-                          </Box>
-                        </ListItem>
-                      </React.Fragment>
-                    ))}
-                  </List>
-                </Paper>
-              </Grid>
-            </Grid>
-          </Container>
+    <Box>
+      {/* Header Info */}
+      <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Box>
+          <Typography variant="h4" className="gradient-text">Tổng quan hệ thống</Typography>
+          <Typography variant="body2" color="text.secondary">Theo dõi toàn bộ hoạt động của NAVI HEALTH</Typography>
         </Box>
+        <Chip
+          icon={<CheckCircle sx={{ fontSize: 16 }} />}
+          label="Hệ thống ổn định"
+          color="success"
+          variant="outlined"
+          sx={{ borderRadius: '8px' }}
+        />
       </Box>
-    </>
+
+      {/* Stats Cards */}
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        {stats.map((stat, index) => (
+          <Grid item xs={12} sm={6} md={3} key={index}>
+            <Card sx={{ borderRadius: '16px' }} className="glass-card">
+              <CardContent>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                  <Box
+                    sx={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: '12px',
+                      bgcolor: stat.color,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: stat.iconColor,
+                    }}
+                  >
+                    {stat.icon}
+                  </Box>
+                  <Typography variant="caption" sx={{ color: '#00A63E', fontWeight: 600 }}>
+                    {stat.change}
+                  </Typography>
+                </Box>
+                <Typography variant="body2" color="text.secondary" gutterBottom>
+                  {stat.title}
+                </Typography>
+                <Typography variant="h5" fontWeight="bold">
+                  {stat.value}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+
+      {/* Lists Section */}
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={6}>
+          <Paper className="glass-card" sx={{ p: 3, borderRadius: '20px' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
+              <Typography variant="h6" fontWeight="bold">Người dùng mới</Typography>
+              <Button size="small" endIcon={<ArrowForward />}>Xem hết</Button>
+            </Box>
+            <List disablePadding>
+              {newUsers.map((user, index) => (
+                <ListItem key={index} sx={{ px: 0, py: 1.5, borderBottom: index < newUsers.length - 1 ? '1px solid #f1f5f9' : 'none' }}>
+                  <Avatar sx={{ bgcolor: '#004aad', mr: 2 }}>{user.name[0]}</Avatar>
+                  <Box sx={{ flexGrow: 1 }}>
+                    <Typography variant="body2" fontWeight={600}>{user.name}</Typography>
+                    <Typography variant="caption" color="text.secondary">{user.email}</Typography>
+                  </Box>
+                  <Chip label={user.badge} size="small" sx={{ fontSize: '10px' }} />
+                </ListItem>
+              ))}
+            </List>
+          </Paper>
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <Paper className="glass-card" sx={{ p: 3, borderRadius: '20px' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
+              <Typography variant="h6" fontWeight="bold">Hồ sơ gần đây</Typography>
+              <Button size="small" endIcon={<ArrowForward />}>Xem hết</Button>
+            </Box>
+            <List disablePadding>
+              {recentRecords.map((record, index) => (
+                <ListItem key={index} sx={{ px: 0, py: 1.5, borderBottom: index < recentRecords.length - 1 ? '1px solid #f1f5f9' : 'none' }}>
+                  <Box sx={{ width: 40, height: 40, bgcolor: 'rgba(81, 157, 177, 0.1)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', mr: 2 }}>
+                    <Article sx={{ color: '#519db1' }} />
+                  </Box>
+                  <Box sx={{ flexGrow: 1 }}>
+                    <Typography variant="body2" fontWeight={600}>{record.title}</Typography>
+                    <Typography variant="caption" color="text.secondary">{record.user}</Typography>
+                  </Box>
+                  <Typography variant="caption" color="text.secondary">{record.date.split(' ')[0]}</Typography>
+                </ListItem>
+              ))}
+            </List>
+          </Paper>
+        </Grid>
+      </Grid>
+    </Box>
   )
 }
 

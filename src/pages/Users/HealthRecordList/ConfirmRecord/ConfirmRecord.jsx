@@ -199,7 +199,7 @@ function DynamicSection({ title, data }) {
 /* =========================
    MAIN COMPONENT
 ========================= */
-function ConfirmRecord({ data }) {
+function ConfirmRecord({ data, message }) {
   let parsedData = data;
 
   // nếu backend trả string JSON
@@ -236,10 +236,10 @@ function ConfirmRecord({ data }) {
           fontSize={22}
           mb={4}
           letterSpacing={1}
+          fontFamily="'Be Vietnam Pro', sans-serif"
         >
-          XÁC NHẬN HỒ SƠ Y TẾ
+          {message.toUpperCase()}
         </Typography>
-
         <Divider sx={{ mb: 4 }} />
 
         {/* DYNAMIC CONTENT */}

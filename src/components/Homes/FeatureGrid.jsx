@@ -105,7 +105,7 @@ const FeatureCard = ({ feature }) => {
 
         <Typography
           sx={{
-            fontFamily: "'Arimo-Regular', Helvetica",
+
             fontWeight: 400,
             color: feature.isLocked ? "#697282" : "#004aad",
             fontSize: "16px",
@@ -122,7 +122,7 @@ const FeatureCard = ({ feature }) => {
           top: "136px",
           left: "26px",
           width: "90%",
-          fontFamily: "'Arimo-Regular', Helvetica",
+
           fontWeight: 400,
           color: feature.isLocked ? "#99a1ae" : "#495565",
           fontSize: "14px",
@@ -151,7 +151,7 @@ const FeatureCard = ({ feature }) => {
           <StarIcon sx={{ fontSize: 12, color: "white" }} />
           <Typography
             sx={{
-              fontFamily: "'Arimo-Regular', Helvetica",
+
               fontWeight: 400,
               color: "white",
               fontSize: "12px",
@@ -198,7 +198,7 @@ const FeatureCard = ({ feature }) => {
 
             <Typography
               sx={{
-                fontFamily: "'Arimo-Bold', Helvetica",
+
                 fontWeight: 700,
                 color: "#004aad",
                 fontSize: "16px",
@@ -215,7 +215,7 @@ const FeatureCard = ({ feature }) => {
                 borderRadius: "14px",
                 background:
                   "linear-gradient(180deg, rgba(81, 157, 177, 1) 0%, rgba(0, 74, 173, 1) 100%)",
-                fontFamily: "'Arimo-Regular', Helvetica",
+
                 fontWeight: 400,
                 color: "white",
                 fontSize: "14px",
@@ -243,7 +243,7 @@ export const FeatureGrid = () => {
       sx={{
         backgroundColor: "white",
         py: "80px",
-        px: "312.5px",
+        px: { xs: 2, md: 4, lg: 8 },
       }}
     >
       <Stack spacing={8}>
@@ -255,7 +255,7 @@ export const FeatureGrid = () => {
               backgroundColor: "rgba(135, 199, 236, 0.2)",
               border: "1px solid rgba(81, 157, 177, 0.3)",
               borderRadius: "8px",
-              fontFamily: "'Arimo-Regular', Helvetica",
+
               fontWeight: 400,
               color: "#004aad",
               fontSize: "12px",
@@ -269,7 +269,7 @@ export const FeatureGrid = () => {
 
           <Typography
             sx={{
-              fontFamily: "'Arimo-Regular', Helvetica",
+
               fontWeight: 400,
               color: "#495565",
               fontSize: "16px",

@@ -1,8 +1,8 @@
 import React from 'react'
 import { Box, Button, Tooltip, Typography } from '@mui/material'
 import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety';
-function Logo({ dimension }) {
-  const { sideBarWidth, logoHeight } = dimension
+function Logo({ dimension = {} }) {
+  const { sideBarWidth = '260px', logoHeight = '80px' } = dimension
   return (
     <Box sx={{
       display: 'flex',

@@ -13,7 +13,11 @@ import {
   Eye,
   Edit,
   Trash2,
+  Download,
 } from 'lucide-react';
+
+import requestApi from '../../apis/apis';
+import { DOWNLOAD_RECORD } from '../../constants/apis';
 
 /* =========================
    HELPERS
@@ -57,6 +61,23 @@ function HealthRecord({ record, onView, onEdit, onDelete }) {
   };
 
   const badgeStyle = getBadgeColor(recordTypeText);
+
+  const handleDownload = async () => {
+    try {
+      const response = await requestApi(`${DOWNLOAD_RECORD}${record.id}.pdf`, 'GET', null, 'blob');
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `HealthRecord_${record.id}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+    }
+  };
 
   return (
     <Card
@@ -150,7 +171,6 @@ function HealthRecord({ record, onView, onEdit, onDelete }) {
                   }}
                   onClick={() => window.open(record.pdf_url, '_blank')}
                 >
-                  <FileText size={14} /> Xem file PDF
                 </Typography>
               )}
             </Box>
@@ -176,6 +196,18 @@ function HealthRecord({ record, onView, onEdit, onDelete }) {
               onClick={() => onView(record.id)}
             >
               <Eye size={18} />
+            </IconButton>
+
+            <IconButton
+              size="small"
+              sx={{
+                width: '36px', height: '36px', borderRadius: '10px',
+                bgcolor: '#f0fdf4', border: '1px solid #dcfce7',
+                '&:hover': { bgcolor: '#dcfce7', borderColor: '#bbf7d0' }
+              }}
+              onClick={handleDownload}
+            >
+              <Download size={18} color="#16a34a" />
             </IconButton>
 
             <IconButton

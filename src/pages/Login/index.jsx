@@ -9,11 +9,13 @@ import {
   Stack,
   TextField,
   Typography,
+  CircularProgress,
+  Fade,
 } from "@mui/material";
 import { useState } from "react";
 import requestApi from "../../apis/apis";
 import { useNavigate } from "react-router-dom";
-import { CircularProgress } from "@mui/material";
+import { Zap } from "lucide-react";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -44,332 +46,135 @@ export default function Login() {
     }
   };
 
-  const handleGoogleLogin = () => {
-    console.log("Google login clicked");
-  };
-
-
-  const handleBackToHome = () => {
-    console.log("Back to home clicked");
-  };
-
-  const handleForgotPassword = () => {
-    navigate('/email')
-  };
-
-  const handleRegister = () => {
-    navigate('/register')
-  };
-
   return (
     <Box
       sx={{
         width: "100%",
         minHeight: "100vh",
-        backgroundImage: 'url(https://www.lechodesarenes.com/wp-content/uploads/2021/04/Du-bon-usage-du-numerique_article_full.jpg)',
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: { xs: 'scroll', md: 'fixed' },
-        display: { xs: "flex", md: "block" },
-        alignItems: { xs: "center", md: "auto" },
-        justifyContent: { xs: "center", md: "auto" },
-        padding: { xs: 2, sm: 3, md: 0 },
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: 'radial-gradient(at 0% 0%, rgba(81, 157, 177, 0.1) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(0, 74, 173, 0.1) 0px, transparent 50%)',
+        bgcolor: '#f8fafc',
+        p: 2,
       }}
     >
-      <Box
-        sx={{
-          position: { xs: "relative", md: "absolute" },
-          top: { xs: "auto", md: "15%" },
-          left: { xs: "auto", md: "35%" },
-          width: { xs: "100%", sm: "90%", md: "30%" },
-          maxWidth: { xs: "none", md: "none" },
-          height: { xs: "auto", md: "70%" },
-        }}
-      >
-        <Stack spacing={3}>
-          <Button
-            startIcon={<ArrowBackIcon />}
-            onClick={handleBackToHome}
-            sx={{
-              width: "fit-content",
-              color: "#519db1",
-              textTransform: "none",
-              fontSize: "14px",
-              fontFamily: "Arimo, Helvetica, sans-serif",
-              padding: 0,
-              "&:hover": {
-                backgroundColor: "transparent",
-                textDecoration: "underline",
-              },
-            }}
-          >
-            Quay lại trang chủ
-          </Button>
+      <Fade in={true} timeout={800}>
+        <Box sx={{ width: "100%", maxWidth: 420 }}>
+          <Stack spacing={3}>
+            <Button
+              startIcon={<ArrowBackIcon />}
+              onClick={() => navigate('/')}
+              sx={{
+                width: "fit-content",
+                color: "#64748b",
+                "&:hover": { color: "#004aad", bgcolor: 'transparent', textDecoration: 'underline' },
+              }}
+            >
+              Quay lại trang chủ
+            </Button>
 
-          <Paper
-            elevation={3}
-            sx={{
-              padding: { xs: "20px", sm: "24px", md: "32px" },
-              borderRadius: { xs: "16px", sm: "18px", md: "20px" },
-              backgroundColor: "rgba(255, 255, 255, 0.95)",
-              boxShadow:
-                "0px 4px 6px -4px rgba(0, 0, 0, 0.1), 0px 10px 15px -3px rgba(0, 0, 0, 0.1)",
-            }}
-          >
-            <Stack spacing={3}>
-              <Typography
-                variant="h6"
-                sx={{
-                  textAlign: "center",
-                  color: "#004aad",
-                  fontFamily: "Arimo, Helvetica, sans-serif",
-                  fontWeight: 'bold',
-                  fontSize: { xs: "18px", sm: "20px", md: "24px" },
-                }}
-              >
-                Đăng nhập
-              </Typography>
-
-              {error && (
-                <Typography color="error" variant="body2" align="center" sx={{ fontFamily: "Arimo, Helvetica, sans-serif" }}>
-                  {error}
-                </Typography>
-              )}
-
-              <Stack spacing={{ xs: 2, sm: 2.5, md: 2.5 }}>
-                <Box>
-                  <Typography
-                    component="label"
-                    htmlFor="email-input"
+            <Paper
+              className="glass-panel"
+              sx={{
+                p: { xs: 4, md: 5 },
+                borderRadius: '24px',
+                bgcolor: 'rgba(255, 255, 255, 0.8)',
+                boxShadow: '0 20px 40px rgba(0, 74, 173, 0.05)',
+              }}
+            >
+              <Stack spacing={4}>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Box
                     sx={{
-                      display: "block",
-                      marginBottom: "8px",
-                      fontSize: { xs: "12px", sm: "13px", md: "14px" },
-                      color: "#354152",
-                      fontFamily: "Arimo, Helvetica, sans-serif",
+                      display: 'inline-flex',
+                      p: 1.5,
+                      borderRadius: '16px',
+                      background: 'linear-gradient(135deg, #519db1 0%, #004aad 100%)',
+                      mb: 2,
+                      boxShadow: '0 8px 20px rgba(0, 74, 173, 0.2)'
                     }}
                   >
-                    Email
+                    <Zap color="white" size={32} />
+                  </Box>
+                  <Typography variant="h4" className="gradient-text" sx={{ mb: 1 }}>
+                    Chào mừng trở lại
                   </Typography>
-                  <TextField
-                    id="email-input"
-                    fullWidth
-                    placeholder="Nhập email của bạn"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        borderRadius: { xs: "8px", sm: "10px", md: "12px" },
-                        height: { xs: "40px", sm: "38px", md: "36px" },
-                        fontSize: { xs: "12px", sm: "13px", md: "14px" },
-                        fontFamily: "Arimo, Helvetica, sans-serif",
-                        "& input": {
-                          padding: { xs: "8px", sm: "6px 12px", md: "4px 12px" },
-                        },
-                        "& input::placeholder": {
-                          color: "#717182",
-                          opacity: 1,
-                        },
-                      },
-                    }}
-                  />
-                </Box>
-
-                <Box>
-                  <Typography
-                    component="label"
-                    htmlFor="password-input"
-                    sx={{
-                      display: "block",
-                      marginBottom: "8px",
-                      fontSize: { xs: "12px", sm: "13px", md: "14px" },
-                      color: "#354152",
-                      fontFamily: "Arimo, Helvetica, sans-serif",
-                    }}
-                  >
-                    Mật khẩu
+                  <Typography variant="body2" color="text.secondary">
+                    Đăng nhập để tiếp tục quản lý sức khỏe của bạn
                   </Typography>
-                  <TextField
-                    id="password-input"
-                    fullWidth
-                    placeholder="Nhập mật khẩu"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        borderRadius: { xs: "8px", sm: "10px", md: "12px" },
-                        height: { xs: "40px", sm: "38px", md: "36px" },
-                        fontSize: { xs: "12px", sm: "13px", md: "14px" },
-                        fontFamily: "Arimo, Helvetica, sans-serif",
-                        "& input": {
-                          padding: { xs: "8px", sm: "6px 12px", md: "4px 12px" },
-                        },
-                        "& input::placeholder": {
-                          color: "#717182",
-                          opacity: 1,
-                        },
-                      },
-                    }}
-                  />
                 </Box>
 
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={rememberMe}
-                        onChange={(e) => setRememberMe(e.target.checked)}
-                        sx={{
-                          padding: 0,
-                          marginRight: "8px",
-                          "& .MuiSvgIcon-root": {
-                            fontSize: { xs: "18px", md: "16px" },
-                          },
-                        }}
-                      />
-                    }
-                    label="Ghi nhớ đăng nhập"
-                    sx={{
-                      margin: 0,
-                      "& .MuiFormControlLabel-label": {
-                        fontSize: { xs: "12px", sm: "13px", md: "14px" },
-                        color: "#495565",
-                        fontFamily: "Arimo, Helvetica, sans-serif",
-                      },
-                    }}
-                  />
-                  <Button
-                    onClick={handleForgotPassword}
-                    sx={{
-                      padding: 0,
-                      minWidth: "auto",
-                      color: "#519db1",
-                      textTransform: "none",
-                      fontSize: { xs: "12px", sm: "13px", md: "14px" },
-                      fontFamily: "Arimo, Helvetica, sans-serif",
-                      "&:hover": {
-                        backgroundColor: "transparent",
-                        textDecoration: "underline",
-                      },
-                    }}
-                  >
-                    Quên mật khẩu?
-                  </Button>
-                </Box>
-
-                <Button
-                  fullWidth
-                  variant="contained"
-                  onClick={handleLogin}
-                  disabled={loading}
-                  sx={{
-                    height: { xs: "40px", sm: "42px", md: "44px" },
-                    backgroundColor: "#004aad",
-                    borderRadius: { xs: "8px", sm: "10px", md: "12px" },
-                    textTransform: "none",
-                    fontSize: { xs: "13px", sm: "14px", md: "14px" },
-                    fontFamily: "Arimo, Helvetica, sans-serif",
-                    fontWeight: 500,
-                    "&:hover": {
-                      backgroundColor: "#003a8c",
-                    },
-                  }}
-                >
-                  {loading ? <CircularProgress size={24} color="inherit" /> : "Đăng nhập"}
-                </Button>
-
-                <Box sx={{ textAlign: "center" }}>
-                  <Typography
-                    component="span"
-                    sx={{
-                      fontSize: { xs: "13px", sm: "14px", md: "16px" },
-                      color: "#495565",
-                      fontFamily: "Arimo, Helvetica, sans-serif",
-                    }}
-                  >
-                    Chưa có tài khoản?{" "}
+                {error && (
+                  <Typography color="error" variant="body2" align="center"
+                    sx={{ bgcolor: 'rgba(239, 68, 68, 0.05)', p: 1.5, borderRadius: '12px' }}>
+                    {error}
                   </Typography>
-                  <Button
-                    onClick={handleRegister}
-                    sx={{
-                      padding: 0,
-                      minWidth: "auto",
-                      color: "#519db1",
-                      textTransform: "none",
-                      fontSize: { xs: "13px", sm: "14px", md: "16px" },
-                      fontFamily: "Arimo, Helvetica, sans-serif",
-                      verticalAlign: "baseline",
-                      "&:hover": {
-                        backgroundColor: "transparent",
-                        textDecoration: "underline",
-                      },
-                    }}
-                  >
-                    Đăng ký ngay
-                  </Button>
-                </Box>
-              </Stack>
+                )}
 
-              <Divider sx={{ position: "relative" }}>
-                <Typography
-                  sx={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    backgroundColor: "white",
-                    padding: "0 16px",
-                    fontSize: { xs: "12px", sm: "13px", md: "14px" },
-                    color: "#697282",
-                    fontFamily: "Arimo, Helvetica, sans-serif",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  Hoặc đăng nhập với
-                </Typography>
-              </Divider>
-
-              <Stack direction="row" spacing={{ xs: 1, sm: 1.5, md: 1.5 }}>
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  onClick={handleGoogleLogin}
-                  startIcon={
-                    <Box
-                      component="img"
-                      src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' width='16px' height='16px'%3E%3Cpath fill='%234285F4' d='M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z'/%3E%3Cpath fill='%2334A853' d='M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z'/%3E%3Cpath fill='%23FBBC05' d='M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24c0 3.55.85 6.91 2.34 9.88l7.35-5.7z'/%3E%3Cpath fill='%23EA4335' d='M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z'/%3E%3C/svg%3E"
-                      sx={{ width: { xs: "14px", md: "16px" }, height: { xs: "14px", md: "16px" } }}
+                <Stack spacing={2.5}>
+                  <Box>
+                    <Typography variant="caption" sx={{ ml: 1, fontWeight: 700, color: '#475569' }}>EMAIL</Typography>
+                    <TextField
+                      fullWidth
+                      placeholder="email@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      sx={{ mt: 0.5 }}
                     />
-                  }
-                  sx={{
-                    height: { xs: "36px", md: "36px" },
-                    borderRadius: { xs: "8px", sm: "10px", md: "12px" },
-                    textTransform: "none",
-                    fontSize: { xs: "12px", sm: "13px", md: "14px" },
-                    color: "#000",
-                    borderColor: "#d0d5db",
-                    fontFamily: "Arimo, Helvetica, sans-serif",
-                    "&:hover": {
-                      borderColor: "#a0a5ab",
-                      backgroundColor: "rgba(0, 0, 0, 0.04)",
-                    },
-                  }}
-                >
-                  Google
-                </Button>
+                  </Box>
+
+                  <Box>
+                    <Typography variant="caption" sx={{ ml: 1, fontWeight: 700, color: '#475569' }}>MẬT KHẨU</Typography>
+                    <TextField
+                      fullWidth
+                      type="password"
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      sx={{ mt: 0.5 }}
+                    />
+                  </Box>
+
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <FormControlLabel
+                      control={<Checkbox checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} size="small" />}
+                      label={<Typography variant="caption" sx={{ fontWeight: 500 }}>Ghi nhớ tôi</Typography>}
+                    />
+                    <Button variant="text" size="small" color="secondary" onClick={() => navigate('/email')}>
+                      Quên mật khẩu?
+                    </Button>
+                  </Box>
+
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    size="large"
+                    onClick={handleLogin}
+                    disabled={loading}
+                    sx={{ py: 1.5, fontSize: '1rem' }}
+                  >
+                    {loading ? <CircularProgress size={24} color="inherit" /> : "Đăng nhập"}
+                  </Button>
+                </Stack>
+
+                <Divider>
+                  <Typography variant="caption" color="text.disabled">HOẶC</Typography>
+                </Divider>
+
+                <Box sx={{ textAlign: 'center' }}>
+                  <Typography variant="body2" color="text.secondary">
+                    Chưa có tài khoản?{" "}
+                    <Button sx={{ fontWeight: 700, p: 0 }} onClick={() => navigate('/register')}>
+                      Đăng ký ngay
+                    </Button>
+                  </Typography>
+                </Box>
               </Stack>
-            </Stack>
-          </Paper>
-        </Stack>
-      </Box>
+            </Paper>
+          </Stack>
+        </Box>
+      </Fade>
     </Box>
   );
 }

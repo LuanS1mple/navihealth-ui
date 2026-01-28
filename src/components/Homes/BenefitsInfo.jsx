@@ -17,7 +17,7 @@ export const BenefitsInfo = () => {
         background:
           "linear-gradient(117deg, rgba(81, 157, 177, 0.05) 0%, rgba(135, 199, 236, 0.1) 100%)",
         py: 10,
-        px: { xs: 4, md: "312.5px" },
+        px: { xs: 4, md: 8, lg: 10 },
         position: "relative",
       }}
     >
@@ -46,7 +46,7 @@ export const BenefitsInfo = () => {
               border: "1px solid rgba(81, 157, 177, 0.3)",
               borderRadius: "8px",
               "& .MuiChip-label": {
-                fontFamily: "'Arimo-Regular', Helvetica",
+
                 fontSize: "12px",
                 lineHeight: "16px",
                 color: "#004aad",
@@ -62,7 +62,7 @@ export const BenefitsInfo = () => {
           <Stack spacing={0}>
             <Typography
               sx={{
-                fontFamily: "'Arimo-Regular', Helvetica",
+
                 fontSize: "16px",
                 lineHeight: "24px",
                 color: "#004aad",
@@ -73,7 +73,7 @@ export const BenefitsInfo = () => {
             </Typography>
             <Typography
               sx={{
-                fontFamily: "'Arimo-Regular', Helvetica",
+
                 fontSize: "16px",
                 lineHeight: "24px",
                 color: "#004aad",
@@ -86,7 +86,7 @@ export const BenefitsInfo = () => {
 
           <Typography
             sx={{
-              fontFamily: "'Arimo-Regular', Helvetica",
+
               fontSize: "16px",
               lineHeight: "24px",
               color: "#495565",
@@ -127,7 +127,7 @@ export const BenefitsInfo = () => {
                 </Box>
                 <Typography
                   sx={{
-                    fontFamily: "'Arimo-Regular', Helvetica",
+
                     fontSize: "16px",
                     lineHeight: "24px",
                     color: "#354152",
@@ -150,7 +150,7 @@ export const BenefitsInfo = () => {
               background:
                 "linear-gradient(180deg, rgba(81, 157, 177, 1) 0%, rgba(0, 74, 173, 1) 100%)",
               color: "white",
-              fontFamily: "'Arimo-Regular', Helvetica",
+
               fontSize: "14px",
               lineHeight: "20px",
               fontWeight: 400,
@@ -184,17 +184,17 @@ export const BenefitsInfo = () => {
               backgroundColor: "transparent",
             }}
           >
-             <Box
-                component="img"
-                src="https://www.lechodesarenes.com/wp-content/uploads/2021/04/Du-bon-usage-du-numerique_article_full.jpg"
-                alt="Preview"
-                sx={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  display: "block",
-                }}
-              />
+            <Box
+              component="img"
+              src="https://www.lechodesarenes.com/wp-content/uploads/2021/04/Du-bon-usage-du-numerique_article_full.jpg"
+              alt="Preview"
+              sx={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                display: "block",
+              }}
+            />
           </Box>
 
           <Box
@@ -227,7 +227,7 @@ export const BenefitsInfo = () => {
               >
                 <Typography
                   sx={{
-                    fontFamily: "'Arimo-Bold', Helvetica",
+
                     fontSize: "20px",
                     lineHeight: "30px",
                     color: "white",
@@ -241,7 +241,7 @@ export const BenefitsInfo = () => {
               <Stack spacing={0}>
                 <Typography
                   sx={{
-                    fontFamily: "'Arimo-Bold', Helvetica",
+
                     fontSize: "20px",
                     lineHeight: "30px",
                     color: "#004aad",
@@ -252,7 +252,7 @@ export const BenefitsInfo = () => {
                 </Typography>
                 <Typography
                   sx={{
-                    fontFamily: "'Arimo-Regular', Helvetica",
+
                     fontSize: "14px",
                     lineHeight: "20px",
                     color: "#495565",

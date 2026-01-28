@@ -49,7 +49,7 @@ export const FeatureCard = () => {
         <Stack spacing={0}>
           <Typography
             sx={{
-              fontFamily: "'Arimo-Regular', Helvetica",
+
               fontWeight: 400,
               color: "white",
               fontSize: "16px",
@@ -63,7 +63,7 @@ export const FeatureCard = () => {
 
           <Typography
             sx={{
-              fontFamily: "'Arimo-Regular', Helvetica",
+
               fontWeight: 400,
               color: "white",
               fontSize: "16px",
@@ -78,7 +78,7 @@ export const FeatureCard = () => {
 
         <Typography
           sx={{
-            fontFamily: "'Arimo-Regular', Helvetica",
+
             fontWeight: 400,
             color: "rgba(255, 254, 254, 0.9)",
             fontSize: "16px",
@@ -106,7 +106,7 @@ export const FeatureCard = () => {
           >
             <Typography
               sx={{
-                fontFamily: "'Arimo-Regular', Helvetica",
+
                 fontWeight: 400,
                 color: "#004aad",
                 fontSize: "14px",
@@ -143,7 +143,7 @@ export const FeatureCard = () => {
           >
             <Typography
               sx={{
-                fontFamily: "'Arimo-Regular', Helvetica",
+
                 fontWeight: 400,
                 color: "white",
                 fontSize: "14px",

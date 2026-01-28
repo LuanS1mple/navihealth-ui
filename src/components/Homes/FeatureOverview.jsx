@@ -33,10 +33,10 @@ export const FeatureOverview = () => {
       <Stack
         spacing={6}
         sx={{
-          maxWidth: "800px",
           width: "100%",
           alignItems: "center",
           mt: 2,
+          px: { xs: 2, md: 4 }
         }}
       >
         <Box
@@ -60,7 +60,7 @@ export const FeatureOverview = () => {
           />
           <Typography
             sx={{
-              fontFamily: "Arimo-Regular, Helvetica",
+
               fontWeight: 400,
               color: "#004aad",
               fontSize: "12px",
@@ -75,7 +75,7 @@ export const FeatureOverview = () => {
         <Stack spacing="3px" alignItems="center">
           <Typography
             sx={{
-              fontFamily: "Arimo-Regular, Helvetica",
+
               fontWeight: 400,
               color: "#004aad",
               fontSize: "24px",
@@ -88,7 +88,7 @@ export const FeatureOverview = () => {
           </Typography>
           <Typography
             sx={{
-              fontFamily: "Arimo-Regular, Helvetica",
+
               fontWeight: 400,
               color: "#519db1",
               fontSize: "16px",
@@ -104,7 +104,7 @@ export const FeatureOverview = () => {
         <Box sx={{ px: 6 }}>
           <Typography
             sx={{
-              fontFamily: "Arimo-Regular, Helvetica",
+
               fontWeight: 400,
               color: "#495565",
               fontSize: "16px",
@@ -136,7 +136,7 @@ export const FeatureOverview = () => {
           >
             <Typography
               sx={{
-                fontFamily: "Arimo-Regular, Helvetica",
+
                 fontWeight: 400,
                 color: "white",
                 fontSize: "14px",
@@ -163,7 +163,7 @@ export const FeatureOverview = () => {
           >
             <Typography
               sx={{
-                fontFamily: "Arimo-Regular, Helvetica",
+
                 fontWeight: 400,
                 color: "#519db1",
                 fontSize: "14px",
@@ -182,7 +182,7 @@ export const FeatureOverview = () => {
               <Stack spacing={1} alignItems="center">
                 <Typography
                   sx={{
-                    fontFamily: "Arimo-Bold, Helvetica",
+
                     fontWeight: 700,
                     color: "#004aad",
                     fontSize: "32px",
@@ -195,7 +195,7 @@ export const FeatureOverview = () => {
                 </Typography>
                 <Typography
                   sx={{
-                    fontFamily: "Arimo-Regular, Helvetica",
+
                     fontWeight: 400,
                     color: "#495565",
                     fontSize: "14px",

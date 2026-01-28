@@ -6,30 +6,18 @@ import {
   Typography,
   TextField,
   Button,
-  Switch,
-  IconButton,
-  Chip,
   InputAdornment,
   MenuItem,
   Select,
   FormControl,
-  Avatar,
   Grid
 } from '@mui/material';
 import {
   FileText,
   Calendar,
-  Upload,
-  GitCompare,
   Search,
-  Eye,
-  Edit,
-  Trash2,
-  Filter,
 } from 'lucide-react';
 import StatCard from '../HealthRecordList/StatCard/StatCard';
-import SideBar from '../../../components/SideBar/SideBar';
-import TopHeader from '../../../components/HeadBar/HeadBar';
 import AddIcon from '@mui/icons-material/Add';
 import Reminder from './Reminder/Reminder';
 
@@ -99,133 +87,83 @@ function ReminderList() {
 
 
   return (
-    <>
-      <Box sx={{display: 'flex'}}>
-        <SideBar/>
-        <Box>
-          <TopHeader/>
-          <Box sx={{mx: 4}}>
-            {/* tổng quan */}
-            <Box sx={{my: 2}}>
-              <Grid sx={{display: 'flex', gap: 2}} spacing={2 }>
-                <Grid item xs={12} md={4} lg={3}>
-                  <StatCard
-                    title="Tổng nhắc nhở"
-                    value="3"
-                    icon={FileText}
-                    bgColor="rgba(135, 199, 236, 0.2)"
-                  />
-                </Grid>
-                <Grid item xs={12} md={4} lg={3}>
-                  <StatCard
-                    title="Đang hoạt động"
-                    value="0"
-                    icon={Calendar}
-                    bgColor="rgba(81, 157, 177, 0.2)"
-                  />
-                </Grid>
-                <Grid item xs={12} md={4} lg={3}>
-                  <StatCard
-                    title="Hôm nay"
-                    value="0"
-                    icon={Calendar}
-                    bgColor="rgba(81, 157, 177, 0.2)"
-                  />
-                </Grid>
-              </Grid>
-            </Box>
-            {/* tìm kiếm */}
-            <Card
-                sx={{
-                  borderRadius: 4,
-                  border: '1px solid rgba(134,203,222,0.3)',
-                  boxShadow: 'none',
-                  mb: 2,
-                }}
-            >
-              <CardContent sx={{ p: 2 }}>
-                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                  <TextField
-                      fullWidth
-                      placeholder="Tìm kiếm nhắc nhở..."
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <Search size={16} color="#99A1AF" />
-                          </InputAdornment>
-                        ),
-                      }}
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          bgcolor: '#f3f3f5',
-                          borderRadius: 3,
-                          '& fieldset': {
-                            borderColor: 'rgba(134,203,222,0.3)',
-                          },
-                        },
-                      }}
-                  />
-                    
-                  <FormControl sx={{ minWidth: 180 }}>
-                    <Select
-                        sx={{
-                          bgcolor: '#f3f3f5',
-                          borderRadius: 3,
-                          '& fieldset': {
-                            borderColor: 'rgba(134,203,222,0.3)',
-                          },
-                        }}
-                      >
-                      <MenuItem value="all">Tất cả loại</MenuItem>
-                      <MenuItem value="medicine">Uống thuốc</MenuItem>
-                      <MenuItem value="checkup">Tái khám</MenuItem>
-                      <MenuItem value="measurement">Đo chỉ số</MenuItem>
-                      <MenuItem value="exercise">Tập luyện</MenuItem>
-                    </Select>
-                    </FormControl>
-
-                    <FormControl sx={{ minWidth: 104 }}>
-                      <Select
-                        sx={{
-                          bgcolor: '#f3f3f5',
-                          borderRadius: 3,
-                          '& fieldset': {
-                            borderColor: 'rgba(134,203,222,0.3)',
-                          },
-                        }}
-                      >
-                        <MenuItem value="all">Tất cả</MenuItem>
-                        <MenuItem value="active">Đang hoạt động</MenuItem>
-                        <MenuItem value="inactive">Tạm dừng</MenuItem>
-                      </Select>
-                    </FormControl>
-
-                    <Button
-                      variant="contained"
-                      startIcon={<AddIcon size={16} />}
-                      sx={{
-                        background: 'linear-gradient(180deg, #519db1 0%, #004aad 100%)',
-                        borderRadius: 3,
-                        textTransform: 'none',
-                        whiteSpace: 'nowrap',
-                        width: '200px',
-                        height: '50px',
-                        px: 3,
-                      }}
-                    >
-                      Tạo nhắc nhở
-                    </Button>
-                  </Box>
-                </CardContent>
-              </Card> 
-            {/* bản ghi */}
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                {reminders.map((reminder) => (<Reminder key={reminder.id} reminder={reminder}/>))}
-              </Box>       
-          </Box>
-        </Box>
+    <Box className="page-transition">
+      <Box>
+        <Typography variant="h4" className="gradient-text">Quản lý nhắc nhở</Typography>
+        <Typography variant="body2" color="text.secondary">Theo dõi lịch uống thuốc và tái khám của bạn</Typography>
       </Box>
-    </>
+
+      {/* Tổng quan */}
+      <Box sx={{ my: 4 }}>
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={4}>
+            <StatCard
+              title="Tổng nhắc nhở"
+              value={reminders.length}
+              icon={FileText}
+              bgColor="rgba(0, 74, 173, 0.05)"
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <StatCard
+              title="Đang hoạt động"
+              value={reminders.filter(r => r.enabled).length}
+              icon={Calendar}
+              bgColor="rgba(81, 157, 177, 0.05)"
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <StatCard
+              title="Hôm nay"
+              value="2"
+              icon={Calendar}
+              bgColor="rgba(81, 157, 177, 0.05)"
+            />
+          </Grid>
+        </Grid>
+      </Box>
+
+      {/* Tìm kiếm & Thao tác */}
+      <Card sx={{ borderRadius: '20px', mb: 3 }} className="glass-card">
+        <CardContent sx={{ p: 2 }}>
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+            <TextField
+              sx={{ flexGrow: 1, minWidth: '200px' }}
+              placeholder="Tìm kiếm nhắc nhở..."
+              size="small"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Search size={18} color="#519db1" />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <FormControl size="small" sx={{ minWidth: 150 }}>
+              <Select defaultValue="all">
+                <MenuItem value="all">Tất cả loại</MenuItem>
+                <MenuItem value="medicine">Uống thuốc</MenuItem>
+                <MenuItem value="checkup">Tái khám</MenuItem>
+              </Select>
+            </FormControl>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              sx={{ px: 3, height: '40px' }}
+            >
+              Tạo nhắc nhở
+            </Button>
+          </Box>
+        </CardContent>
+      </Card>
+
+      {/* Danh sách bản ghi */}
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {reminders.map((reminder) => (
+          <Reminder key={reminder.id} reminder={reminder} />
+        ))}
+      </Box>
+    </Box>
   )
 }
 

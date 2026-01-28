@@ -1,54 +1,63 @@
 import React from "react"
-import NaviHealth from "../src/pages/Home/index"
-import Login from "../src/pages/Login/index"
-import Register from "../src/pages/Register/index"
+import { Routes, Route } from "react-router-dom"
+
+// Layouts
 import MainLayout from "./layouts/MainLayout"
-import SideBar from "./components/SideBar/SideBar"
-import { Box } from "@mui/material"
+
+// Auth Pages
+import Login from "./pages/Login"
+import Register from "./pages/Register"
+import ResetPassword from "./pages/ResetPassword/ResetPassword"
+import EmailReset from "./pages/EmailReset/EmailReset"
+
+// User Pages
 import Main from "./pages/Users/Main/Main"
-import HealthRecord from "./components/HealthRecord/HealthRecord"
 import HealthRecordList from "./pages/Users/HealthRecordList/HealthRecordList"
 import ChatBot from "./pages/Users/ChatBot/ChatBot"
 import ReminderList from "./pages/Users/ReminderList/ReminderList"
-import SideBarAdmin from "./pages/Admins/SideBar/SideBarAdmin"
+import Profile from "./pages/Profile/Profile"
+
+// Admin Pages
 import MainScreen from "./pages/Admins/MainScreen/MainScreen"
 import UserManagement from "./pages/Admins/UserManagement/UserManagement"
 import DashBoard from "./pages/Admins/DasbBoard/DashBoard"
-import { Routes, Route } from "react-router-dom"
+
+// Other Pages
+import Guest from "./pages/Guest/Guest"
 import Privacy from "./pages/Privacy/Privacy"
-import ResetPassword from "./pages/ResetPassword/ResetPassword"
-import EmailReset from "./pages/EmailReset/EmailReset"
+
 function App() {
   return (
-    <>
-      <Routes>
-        {/* Auth (No Layout) */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/reset" element={<ResetPassword />} />
-        <Route path="/email" element={<EmailReset />} />
+    <Routes>
+      {/* Landing Page */}
+      <Route path="/" element={<Guest />} />
 
-        {/* Authenticated Pages (With MainLayout) */}
-        <Route element={<MainLayout />}>
-          <Route path="/health-records" element={<HealthRecordList />} />
-          <Route path="/reminders" element={<ReminderList />} />
-          <Route path="/main-screen" element={<MainScreen />} />
-          <Route path="/users" element={<UserManagement />} />
-          <Route path="/dashboard" element={<DashBoard />} />
+      {/* Auth */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/reset" element={<ResetPassword />} />
+      <Route path="/email" element={<EmailReset />} />
 
-          {/* Components demo / Old routes mapped to layout */}
-          <Route path="/main" element={<Main />} />
-          <Route path="/chatbot" element={<ChatBot />} />
-          <Route path="/privacy" element={<Privacy />} />
-        </Route>
+      {/* User Routes */}
+      <Route element={<MainLayout isAdmin={false} />}>
+        <Route path="/main" element={<Main />} />
+        <Route path="/health-records" element={<HealthRecordList />} />
+        <Route path="/chatbot" element={<ChatBot />} />
+        <Route path="/reminders" element={<ReminderList />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/privacy" element={<Privacy />} />
+      </Route>
 
-        {/* Standalone Sidebar Demo (Keep if needed, otherwise could remove) */}
-        <Route path="/sidebar" element={<SideBar />} />
+      {/* Admin Routes */}
+      <Route element={<MainLayout isAdmin={true} />}>
+        <Route path="/main-screen" element={<MainScreen />} />
+        <Route path="/users" element={<UserManagement />} />
+        <Route path="/dashboard" element={<DashBoard />} />
+      </Route>
 
-        {/* Default */}
-        <Route path="*" element={<Login />} />
-      </Routes>
-    </>
+      {/* Default redirect to Guest */}
+      <Route path="*" element={<Guest />} />
+    </Routes>
   )
 }
 

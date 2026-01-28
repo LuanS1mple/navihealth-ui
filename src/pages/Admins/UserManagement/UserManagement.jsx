@@ -1,6 +1,4 @@
-import { Box, Divider } from '@mui/material'
 import React from 'react'
-import SideBarAdmin from '../SideBar/SideBarAdmin'
 import UserCard from '../../../components/UserCard/UserCard'
 import {
   Typography,
@@ -12,25 +10,19 @@ import {
   MenuItem,
   FormControl,
   InputAdornment,
-  Avatar,
+  Box,
   Chip,
-  IconButton,
   Button,
 } from '@mui/material';
 import {
   Search as SearchIcon,
-  KeyboardArrowDown as ArrowDownIcon,
-  MoreVert as MoreVertIcon,
-  ArrowBack as ArrowBackIcon,
   CheckCircle as CheckCircleIcon,
   Cancel as CancelIcon,
   Favorite as FavoriteIcon,
-  Email as EmailIcon,
-  Phone as PhoneIcon,
-  Description as DescriptionIcon,
   PersonAdd as PersonAddIcon,
 } from '@mui/icons-material';
 import StatCard from './StatCard/StatCard';
+
 function UserManagement() {
   const usersData = [
     {
@@ -89,9 +81,11 @@ function UserManagement() {
       color: 'linear-gradient(135deg, rgb(43, 127, 255) 0%, rgb(21, 93, 252) 100%)',
     },
   ];
+
   const [searchTerm, setSearchTerm] = React.useState('');
   const [statusFilter, setStatusFilter] = React.useState('all');
   const [packageFilter, setPackageFilter] = React.useState('all');
+
   const filteredUsers = usersData.filter(user => {
     const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase());
@@ -103,176 +97,102 @@ function UserManagement() {
       (packageFilter === 'free' && user.premium === 'Free');
     return matchesSearch && matchesStatus && matchesPackage;
   });
-  const totalUsers = usersData.length;
-  const activeUsers = usersData.filter(u => u.status === 'active').length;
-  const blockedUsers = usersData.filter(u => u.status === 'blocked').length;
-  const premiumUsers = usersData.filter(u => u.premium !== 'Free').length;
+
   return (
-    <>
-      <Box sx={{ display: 'flex', width: '100vw' }}>
-        <SideBarAdmin />
-        <Box sx={{ p: 3, width: '100%' }}>
-
-          {/* header  */}
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Button
-                startIcon={<ArrowBackIcon />}
-                sx={{ color: '#4a5565', textTransform: 'none' }}
-              >
-                Quay lại Dashboard
-              </Button>
-              <Divider orientation='vertical' sx={{ opacity: 0.9 }} flexItem></Divider>
-              <Typography variant="h6" fontWeight="bold">
-                Quản lý người dùng
-              </Typography>
-            </Box>
-            <Button
-              variant="contained"
-              startIcon={<Avatar sx={{ width: 24, height: 24, bgcolor: '#1e293b' }}>A</Avatar>}
-              sx={{
-                backgroundColor: '#1e293b',
-                borderRadius: 2,
-                textTransform: 'none',
-                px: 2,
-              }}
-            >
-              ADMIN
-            </Button>
-          </Box>
-
-          {/* Thống kê */}
-          <Grid sx={{ display: 'flex', justifyContent: 'space-between', my: 3 }}>
-            <Grid sx={{ width: '24%' }} item xs={12} sm={6} md={3}>
-              <StatCard
-                title="Tổng người dùng"
-                value={totalUsers}
-                icon={<PersonAddIcon />}
-                color="#155DFC"
-                bgColor="#eff6ff"
-              />
-            </Grid>
-            <Grid sx={{ width: '24%' }} item xs={12} sm={6} md={3}>
-              <StatCard
-                title="Đang hoạt động"
-                value={activeUsers}
-                icon={<CheckCircleIcon />}
-                color="#00A63E"
-                bgColor="#f0fdf4"
-              />
-            </Grid>
-            <Grid sx={{ width: '24%' }} item xs={12} sm={6} md={3}>
-              <StatCard
-                title="Bị khóa"
-                value={blockedUsers}
-                icon={<CancelIcon />}
-                color="#E7000B"
-                bgColor="#fef2f2"
-              />
-            </Grid>
-            <Grid sx={{ width: '24%' }} item xs={12} sm={6} md={3}>
-              <StatCard
-                title="Premium"
-                value={premiumUsers}
-                icon={<FavoriteIcon />}
-                color="#F54900"
-                bgColor="#fff7ed"
-              />
-            </Grid>
-          </Grid>
-
-
-          {/* Filter  */}
-          <Card sx={{ borderRadius: 4, border: '1px solid #e5e7eb', mb: 3 }}>
-            <CardContent sx={{
-              px: 1, "&:last-child": {
-                pb: 2
-              }
-            }}>
-              <Grid sx={{ display: 'flex', justifyContent: 'space-around' }}>
-                <Grid sx={{ width: '70%' }} item xs={12} md={6}>
-                  <TextField
-                    fullWidth
-                    placeholder="Tìm kiếm theo tên, email, ID..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <SearchIcon sx={{ color: '#99A1AF' }} />
-                        </InputAdornment>
-                      ),
-                    }}
-                    sx={{
-                      backgroundColor: '#f3f3f5',
-                      '& .MuiOutlinedInput-root': {
-                        borderRadius: 1.5,
-                        '& fieldset': {
-                          borderColor: '#d1d5dc',
-                        },
-                      },
-                    }}
-                  />
-                </Grid>
-                <Grid sx={{ width: '12%' }} item xs={12} sm={6} md={3}>
-                  <FormControl fullWidth>
-                    <Select
-                      value={statusFilter}
-                      onChange={(e) => setStatusFilter(e.target.value)}
-                      IconComponent={ArrowDownIcon}
-                      sx={{
-                        backgroundColor: '#f3f3f5',
-                        borderRadius: 1.5,
-                        '& fieldset': {
-                          borderColor: '#d1d5dc',
-                        },
-                      }}
-                    >
-                      <MenuItem value="all">Tất cả</MenuItem>
-                      <MenuItem value="active">Hoạt động</MenuItem>
-                      <MenuItem value="blocked">Bị khóa</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid sx={{ width: '12%' }} item xs={12} sm={6} md={3}>
-                  <FormControl fullWidth>
-                    <Select
-                      value={packageFilter}
-                      onChange={(e) => setPackageFilter(e.target.value)}
-                      IconComponent={ArrowDownIcon}
-                      sx={{
-                        backgroundColor: '#f3f3f5',
-                        borderRadius: 1.5,
-                        '& fieldset': {
-                          borderColor: '#d1d5dc',
-                        },
-                      }}
-                    >
-                      <MenuItem value="all">Tất cả gói</MenuItem>
-                      <MenuItem value="premium">Premium</MenuItem>
-                      <MenuItem value="free">Free</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-              </Grid>
-            </CardContent>
-          </Card>
-
-
-          {/* List User */}
-          <Box>
-            {filteredUsers.map(user => (
-              <UserCard key={user.id} user={user} />
-            ))}
-            {filteredUsers.length === 0 && (
-              <Card sx={{ borderRadius: 2, border: '1px solid #e5e7eb', p: 4, textAlign: 'center' }}>
-                <Typography color="text.secondary">Không tìm thấy người dùng nào</Typography>
-              </Card>
-            )}
-          </Box>
-        </Box>
+    <Box>
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h4" className="gradient-text">Quản lý người dùng</Typography>
+        <Typography variant="body2" color="text.secondary">Danh sách và phân quyền người dùng hệ thống</Typography>
       </Box>
-    </>
+
+      {/* Stats row */}
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Tổng người dùng"
+            value={usersData.length}
+            icon={<PersonAddIcon />}
+            color="#155DFC"
+            bgColor="#eff6ff"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Hoạt động"
+            value={usersData.filter(u => u.status === 'active').length}
+            icon={<CheckCircleIcon />}
+            color="#00A63E"
+            bgColor="#f0fdf4"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Bị khóa"
+            value={usersData.filter(u => u.status === 'blocked').length}
+            icon={<CancelIcon />}
+            color="#E7000B"
+            bgColor="#fef2f2"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Premium"
+            value={usersData.filter(u => u.premium !== 'Free').length}
+            icon={<FavoriteIcon />}
+            color="#F54900"
+            bgColor="#fff7ed"
+          />
+        </Grid>
+      </Grid>
+
+      {/* Filters */}
+      <Card sx={{ borderRadius: '20px', mb: 3 }} className="glass-card">
+        <CardContent sx={{ p: 2 }}>
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+            <TextField
+              sx={{ flexGrow: 1, minWidth: '250px' }}
+              size="small"
+              placeholder="Tìm kiếm theo tên, email..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon size={18} color="#99A1AF" />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <FormControl size="small" sx={{ minWidth: 150 }}>
+              <Select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+                <MenuItem value="all">Tất cả trạng thái</MenuItem>
+                <MenuItem value="active">Hoạt động</MenuItem>
+                <MenuItem value="blocked">Bị khóa</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl size="small" sx={{ minWidth: 150 }}>
+              <Select value={packageFilter} onChange={(e) => setPackageFilter(e.target.value)}>
+                <MenuItem value="all">Tất cả loại gói</MenuItem>
+                <MenuItem value="premium">Premium</MenuItem>
+                <MenuItem value="free">Free</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+        </CardContent>
+      </Card>
+
+      {/* List users */}
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {filteredUsers.map(user => (
+          <UserCard key={user.id} user={user} />
+        ))}
+        {filteredUsers.length === 0 && (
+          <Typography sx={{ textAlign: 'center', py: 4, color: 'text.secondary' }}>
+            Không tìm thấy người dùng nào
+          </Typography>
+        )}
+      </Box>
+    </Box>
   )
 }
 

@@ -21,7 +21,7 @@ export const AppFooter = () => {
         backgroundColor: "#004aad",
         pt: 6,
         pb: 0,
-        px: { xs: 4, md: "312.5px" },
+        px: { xs: 4, md: 8, lg: 10 },
         mt: 10,
         width: "100%",
       }}
@@ -52,7 +52,7 @@ export const AppFooter = () => {
               </Box>
               <Typography
                 sx={{
-                  fontFamily: "Arimo-Bold, Helvetica",
+
                   fontWeight: 700,
                   color: "white",
                   fontSize: "20px",
@@ -65,7 +65,7 @@ export const AppFooter = () => {
             </Stack>
             <Typography
               sx={{
-                fontFamily: "Arimo-Regular, Helvetica",
+
                 fontWeight: 400,
                 color: "#fffefecc",
                 fontSize: "16px",
@@ -81,7 +81,7 @@ export const AppFooter = () => {
           <Stack spacing={2} sx={{ minWidth: "296px" }}>
             <Typography
               sx={{
-                fontFamily: "Arimo-Bold, Helvetica",
+
                 fontWeight: 700,
                 color: "white",
                 fontSize: "16px",
@@ -98,7 +98,7 @@ export const AppFooter = () => {
                   href="#"
                   underline="none"
                   sx={{
-                    fontFamily: "Arimo-Regular, Helvetica",
+
                     fontWeight: 400,
                     color: "#fffefecc",
                     fontSize: "16px",
@@ -119,7 +119,7 @@ export const AppFooter = () => {
           <Stack spacing={2} sx={{ minWidth: "296px" }}>
             <Typography
               sx={{
-                fontFamily: "Arimo-Bold, Helvetica",
+
                 fontWeight: 700,
                 color: "white",
                 fontSize: "16px",
@@ -136,7 +136,7 @@ export const AppFooter = () => {
                   href="#"
                   underline="none"
                   sx={{
-                    fontFamily: "Arimo-Regular, Helvetica",
+
                     fontWeight: 400,
                     color: "#fffefecc",
                     fontSize: "16px",
@@ -164,7 +164,7 @@ export const AppFooter = () => {
         >
           <Typography
             sx={{
-              fontFamily: "Arimo-Regular, Helvetica",
+
               fontWeight: 400,
               color: "#fffefe99",
               fontSize: "14px",

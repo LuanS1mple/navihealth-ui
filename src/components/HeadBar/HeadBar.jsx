@@ -2,10 +2,13 @@ import { Box, Typography, Avatar, Badge, IconButton } from "@mui/material";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import MenuIcon from '@mui/icons-material/Menu';
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import requestApi from "../../apis/apis";
 import { GET_ME } from "../../constants/apis";
 
 export default function TopHeader(props) {
+  const navigate = useNavigate();
+
   const today = new Date().toLocaleDateString("vi-VN", {
     weekday: "long",
     day: "2-digit",
@@ -32,6 +35,10 @@ export default function TopHeader(props) {
 
     fetchUserData();
   }, []);
+
+  const handleAvatarClick = () => {
+    navigate('/profile');
+  };
 
   return (
     <Box
@@ -81,7 +88,10 @@ export default function TopHeader(props) {
           </Badge>
         </IconButton>
 
-        <Avatar sx={{ bgcolor: "#90caf9" }}>
+        <Avatar
+          sx={{ bgcolor: "#90caf9", cursor: "pointer" }}
+          onClick={handleAvatarClick}
+        >
           {user.username ? user.username.charAt(0).toUpperCase() : "U"}
         </Avatar>
       </Box>
