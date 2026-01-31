@@ -1,4 +1,4 @@
-export const DOMAIN_API = 'http://222.255.180.18/api/'
+export const DOMAIN_API = 'http://localhost:5062/api/'
 export const UPLOAD_API = 'medical-record/extract'
 export const SAVE_RECORD = 'medical-record/save'
 export const SEND_EMAIL_RESET = 'auth/forgot-password'
@@ -16,3 +16,6 @@ export const CHAT = 'chat'
 export const NEW_CHAT = 'chat/new'
 export const GET_CONVERSATIONS = 'chat/conversations'
 export const GET_CHAT_HISTORY = 'chat/history/'
+
+// Reminder APIs
+export const REMINDERS = 'reminders'

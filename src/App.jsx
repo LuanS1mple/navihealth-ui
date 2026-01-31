@@ -15,6 +15,7 @@ import Main from "./pages/Users/Main/Main"
 import HealthRecordList from "./pages/Users/HealthRecordList/HealthRecordList"
 import ChatBot from "./pages/Users/ChatBot/ChatBot"
 import ReminderList from "./pages/Users/ReminderList/ReminderList"
+import ServicePlans from "./pages/Users/ServicePlans/ServicePlans"
 import Profile from "./pages/Profile/Profile"
 
 // Admin Pages
@@ -44,6 +45,7 @@ function App() {
         <Route path="/health-records" element={<HealthRecordList />} />
         <Route path="/chatbot" element={<ChatBot />} />
         <Route path="/reminders" element={<ReminderList />} />
+        <Route path="/services" element={<ServicePlans />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/privacy" element={<Privacy />} />
       </Route>

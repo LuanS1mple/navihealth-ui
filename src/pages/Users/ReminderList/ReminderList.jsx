@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Box,
   Card,
@@ -7,10 +7,9 @@ import {
   TextField,
   Button,
   InputAdornment,
-  MenuItem,
-  Select,
-  FormControl,
-  Grid
+  Grid,
+  CircularProgress,
+  Stack
 } from '@mui/material';
 import {
   FileText,
@@ -20,81 +19,102 @@ import {
 import StatCard from '../HealthRecordList/StatCard/StatCard';
 import AddIcon from '@mui/icons-material/Add';
 import Reminder from './Reminder/Reminder';
+import ReminderModal from './ReminderModal';
+import requestApi from '../../../apis/apis';
+import { REMINDERS } from '../../../constants/apis';
 
 function ReminderList() {
-  const reminders = [
-    {
-      id: 1,
-      title: 'Uống thuốc huyết áp',
-      category: 'Uống thuốc',
-      description: 'Uống 1 viên Amlodipine 5mg sau bữa sáng',
-      date: '2/11/2024',
-      time: '08:00',
-      frequency: 'Hàng ngày',
-      enabled: true,
-      icon: <Calendar size={24} />,
-      iconBg: '#dbeafe',
-      categoryColor: '#1447e6',
-      categoryBg: '#dbeafe',
-      categoryBorder: '#bedbff',
-    },
-    {
-      id: 2,
-      title: 'Tái khám tim mạch',
-      category: 'Tái khám',
-      description: 'Khám định kỳ tại phòng khám Tim mạch - BS. Trần Thị B',
-      date: '15/11/2024',
-      time: '14:30',
-      frequency: 'Một lần',
-      enabled: true,
-      icon: <Calendar size={24} />,
-      iconBg: '#dcfce7',
-      categoryColor: '#008236',
-      categoryBg: '#dcfce7',
-      categoryBorder: '#b9f8cf',
-    },
-    {
-      id: 3,
-      title: 'Đo huyết áp',
-      category: 'Đo chỉ số',
-      description: 'Đo huyết áp vào buổi sáng và ghi lại kết quả',
-      date: '2/11/2024',
-      time: '07:00',
-      frequency: 'Hàng ngày',
-      enabled: true,
-      icon: <Calendar size={24} />,
-      iconBg: '#fef3c7',
-      categoryColor: '#d97706',
-      categoryBg: '#fef3c7',
-      categoryBorder: '#fde68a',
-    },
-    {
-      id: 4,
-      title: 'Tập thể dục',
-      category: 'Tập luyện',
-      description: 'Đi bộ 30 phút hoặc tập yoga',
-      date: '2/11/2024',
-      time: '06:00',
-      frequency: 'T2, T4, T6',
-      enabled: false,
-      icon: <Calendar size={24} />,
-      iconBg: '#fce7f3',
-      categoryColor: '#be185d',
-      categoryBg: '#fce7f3',
-      categoryBorder: '#fbcfe8',
-    },
-  ];
+  const [reminders, setReminders] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
+  // Modal state
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editData, setEditData] = useState(null);
+
+  useEffect(() => {
+    fetchReminders();
+  }, []);
+
+  const fetchReminders = async () => {
+    setLoading(true);
+    try {
+      const response = await requestApi(REMINDERS, 'GET');
+      if (response.status === 200) {
+        setReminders(response.data);
+      }
+    } catch (err) {
+      console.error("Fetch reminders error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOpenCreate = () => {
+    setEditData(null);
+    setModalOpen(true);
+  };
+
+  const handleOpenEdit = (reminder) => {
+    setEditData(reminder);
+    setModalOpen(true);
+  };
+
+  const handleSave = async (data) => {
+    try {
+      if (editData) {
+        // Update
+        await requestApi(`${REMINDERS}/${editData.id}`, 'PUT', data);
+      } else {
+        // Create
+        await requestApi(REMINDERS, 'POST', data);
+      }
+      setModalOpen(false);
+      fetchReminders();
+    } catch (err) {
+      console.error("Save reminder error:", err);
+      alert("Không thể lưu nhắc nhở. Vui lòng thử lại.");
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Bạn có chắc chắn muốn xóa nhắc nhở này?")) return;
+    try {
+      await requestApi(`${REMINDERS}/${id}`, 'DELETE');
+      fetchReminders();
+    } catch (err) {
+      console.error("Delete reminder error:", err);
+      alert("Không thể xóa nhắc nhở.");
+    }
+  };
+
+  const handleToggle = async (id) => {
+    try {
+      await requestApi(`${REMINDERS}/${id}/toggle`, 'PATCH');
+      // Update local state for better UX
+      setReminders(prev => prev.map(r =>
+        r.id === id ? { ...r, isActive: !r.isActive } : r
+      ));
+    } catch (err) {
+      console.error("Toggle reminder error:", err);
+      alert("Không thể thay đổi trạng thái.");
+    }
+  };
+
+  const filteredReminders = reminders.filter(r =>
+    r.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (r.message && r.message.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
 
   return (
     <Box className="page-transition">
-      <Box>
+      <Box sx={{ mb: 2 }}>
         <Typography variant="h4" className="gradient-text">Quản lý nhắc nhở</Typography>
         <Typography variant="body2" color="text.secondary">Theo dõi lịch uống thuốc và tái khám của bạn</Typography>
       </Box>
 
       {/* Tổng quan */}
-      <Box sx={{ my: 4 }}>
+      <Box sx={{ mb: 4 }}>
         <Grid container spacing={3}>
           <Grid item xs={12} md={4}>
             <StatCard
@@ -107,17 +127,17 @@ function ReminderList() {
           <Grid item xs={12} md={4}>
             <StatCard
               title="Đang hoạt động"
-              value={reminders.filter(r => r.enabled).length}
+              value={reminders.filter(r => r.isActive).length}
               icon={Calendar}
               bgColor="rgba(81, 157, 177, 0.05)"
             />
           </Grid>
           <Grid item xs={12} md={4}>
             <StatCard
-              title="Hôm nay"
-              value="2"
+              title="Lịch hôm nay"
+              value={reminders.filter(r => r.isActive && r.repeatDays.includes(new Date().getDay())).length}
               icon={Calendar}
-              bgColor="rgba(81, 157, 177, 0.05)"
+              bgColor="rgba(20, 71, 230, 0.05)"
             />
           </Grid>
         </Grid>
@@ -131,6 +151,8 @@ function ReminderList() {
               sx={{ flexGrow: 1, minWidth: '200px' }}
               placeholder="Tìm kiếm nhắc nhở..."
               size="small"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -139,17 +161,11 @@ function ReminderList() {
                 ),
               }}
             />
-            <FormControl size="small" sx={{ minWidth: 150 }}>
-              <Select defaultValue="all">
-                <MenuItem value="all">Tất cả loại</MenuItem>
-                <MenuItem value="medicine">Uống thuốc</MenuItem>
-                <MenuItem value="checkup">Tái khám</MenuItem>
-              </Select>
-            </FormControl>
             <Button
               variant="contained"
               startIcon={<AddIcon />}
-              sx={{ px: 3, height: '40px' }}
+              onClick={handleOpenCreate}
+              sx={{ px: 3, height: '40px', borderRadius: '10px' }}
             >
               Tạo nhắc nhở
             </Button>
@@ -157,12 +173,39 @@ function ReminderList() {
         </CardContent>
       </Card>
 
-      {/* Danh sách bản ghi */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        {reminders.map((reminder) => (
-          <Reminder key={reminder.id} reminder={reminder} />
-        ))}
-      </Box>
+      {/* Danh sách nhắc nhở */}
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 10 }}>
+          <CircularProgress color="secondary" />
+        </Box>
+      ) : (
+        <Stack spacing={2}>
+          {filteredReminders.map((reminder) => (
+            <Reminder
+              key={reminder.id}
+              reminder={reminder}
+              onToggle={handleToggle}
+              onEdit={handleOpenEdit}
+              onDelete={handleDelete}
+            />
+          ))}
+          {filteredReminders.length === 0 && (
+            <Box sx={{ textAlign: 'center', py: 10 }}>
+              <Typography color="text.secondary">
+                {searchTerm ? "Không tìm thấy nhắc nhở phù hợp" : "Bạn chưa có nhắc nhở nào. Hãy bắt đầu bằng cách nhấn 'Tạo nhắc nhở'"}
+              </Typography>
+            </Box>
+          )}
+        </Stack>
+      )}
+
+      {/* Modal */}
+      <ReminderModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSave={handleSave}
+        initialData={editData}
+      />
     </Box>
   )
 }
