@@ -6,7 +6,11 @@ import {
   Typography,
   Button,
   Stack,
-  Chip
+  Chip,
+  Link,
+  IconButton,
+  SvgIcon,
+  Divider
 } from '@mui/material';
 import {
   HealthAndSafety as HealthIcon,
@@ -17,11 +21,25 @@ import {
   PersonAdd as RegisterIcon,
   ArrowForward as ArrowIcon,
   CheckCircle as CheckIcon,
-  FitnessCenter as FitnessIcon
+  FitnessCenter as FitnessIcon,
+  Dashboard as DashboardIcon,
+  Menu as MenuIcon,
+  Phone as PhoneIcon,
+  Email as EmailIcon,
+  Instagram as InstagramIcon,
+  Facebook as FacebookIcon
 } from '@mui/icons-material';
+import bgGuest from '../../assets/bg_guest.png';
+
+const TikTokIcon = (props) => (
+  <SvgIcon {...props}>
+    <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02c.08 1.53.63 3.09 1.75 4.17c1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97c-.57-.26-1.1-.59-1.62-.93c-.01 2.92.01 5.84-.02 8.75c-.03 1.4-.54 2.79-1.35 3.94c-1.31 1.92-3.58 3.17-5.91 3.21c-1.43.08-2.86-.31-4.08-1.03c-2.02-1.19-3.44-3.37-3.65-5.71c-.02-.5-.03-1-.01-1.49c.18-1.9 1.12-3.72 2.58-4.96c1.66-1.44 3.98-2.13 6.15-1.72v4.02c-1.32-.44-2.86-.12-3.91.82c-.68.56-1.08 1.39-1.1 2.26c-.04 1.39 1.1 2.67 2.48 2.71c1.06.1 2.1-.46 2.6-1.39c.09-.22.13-.45.14-.68c.02-3.29-.03-6.59-.01-9.89c-.01-.32-.01-.65-.01-.98Z" />
+  </SvgIcon>
+);
 
 function Guest() {
   const navigate = useNavigate();
+  const isLoggedIn = !!localStorage.getItem('accessToken');
 
   const features = [
     {
@@ -79,134 +97,191 @@ function Guest() {
       {/* Hero Section */}
       <Box
         sx={{
-          background: 'linear-gradient(135deg, #1e73be 0%, #2196f3 50%, #4facfe 100%)',
-          color: 'white',
-          py: { xs: 10, md: 15 },
+          backgroundImage: { xs: 'none', md: `url(${bgGuest})` },
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          bgcolor: { xs: '#f0f7ff', md: 'transparent' },
+          background: {
+            xs: 'linear-gradient(135deg, #e3f2fd 0%, #f1f8ff 100%)',
+            md: `url(${bgGuest}) center/cover no-repeat`
+          },
+          minHeight: '100vh',
           position: 'relative',
-          overflow: 'hidden',
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%)',
-            pointerEvents: 'none'
-          }
+          display: 'flex',
+          flexDirection: 'column'
         }}
       >
+        {/* Header inside Hero */}
         <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
-          <Box sx={{ textAlign: 'center' }}>
-            <Chip
-              label="🎉 Chào mừng đến với NaviHealth"
-              sx={{
-                bgcolor: 'rgba(255,255,255,0.2)',
-                color: 'white',
-                fontWeight: 600,
-                mb: 3,
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255,255,255,0.3)',
-                fontSize: '1rem',
-                py: 2.5,
-                px: 1,
-                fontFamily: '"Be Vietnam Pro", sans-serif'
-              }}
-            />
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              py: 3
+            }}
+          >
+            <Stack direction="row" alignItems="center" spacing={1}>
+              <Box
+                sx={{
+                  bgcolor: '#1976d2',
+                  borderRadius: 2,
+                  p: 0.5,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <HealthIcon sx={{ color: 'white', fontSize: 32 }} />
+              </Box>
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 700,
+                  color: '#2c3e50',
+                  fontSize: '1.5rem',
+                  letterSpacing: '-0.5px'
+                }}
+              >
+                NaviHealth
+              </Typography>
+            </Stack>
+
+            <Stack direction="row" spacing={4} alignItems="center" sx={{ display: { xs: 'none', md: 'flex' } }}>
+              <Typography
+                onClick={() => document.getElementById('features').scrollIntoView({ behavior: 'smooth' })}
+                sx={{
+                  fontWeight: 600,
+                  color: '#2c3e50',
+                  cursor: 'pointer',
+                  '&:hover': { color: '#1976d2' }
+                }}
+              >
+                Tính năng
+              </Typography>
+              <Typography
+                onClick={() => document.getElementById('benefits').scrollIntoView({ behavior: 'smooth' })}
+                sx={{
+                  fontWeight: 600,
+                  color: '#2c3e50',
+                  cursor: 'pointer',
+                  '&:hover': { color: '#1976d2' }
+                }}
+              >
+                Cách dùng
+              </Typography>
+              <MenuIcon sx={{ color: '#2c3e50', cursor: 'pointer' }} />
+            </Stack>
+            <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+              <MenuIcon sx={{ color: '#2c3e50' }} />
+            </Box>
+          </Box>
+        </Container>
+
+        {/* Hero Content */}
+        <Container maxWidth="lg" sx={{ flex: 1, display: 'flex', alignItems: 'center', position: 'relative', zIndex: 1 }}>
+          <Box sx={{ maxWidth: '600px', py: { xs: 5, md: 0 } }}>
             <Typography
               variant="h1"
               sx={{
                 fontWeight: 800,
-                mb: 3,
-                fontSize: { xs: '2.5rem', md: '4rem' },
+                mb: 4,
+                fontSize: { xs: '2.2rem', md: '2.8rem' },
                 lineHeight: 1.2,
-                textShadow: '0 2px 10px rgba(0,0,0,0.1)',
+                color: '#2c3e50',
                 fontFamily: '"Be Vietnam Pro", sans-serif'
               }}
             >
-              Quản Lý Sức Khỏe
+              Đi khám nhưng không nhớ
               <br />
-              <span style={{ color: '#fee140' }}>Thông Minh & Hiện Đại</span>
+              đang uống thuốc gì —
+              <br />
+              rất nhiều gia đình gặp.
             </Typography>
+
             <Typography
               variant="h5"
               sx={{
-                mb: 5,
-                opacity: 0.95,
+                mb: 4,
+                color: '#546e7a',
                 fontWeight: 400,
-                fontSize: { xs: '1.1rem', md: '1.5rem' },
-                maxWidth: '800px',
-                mx: 'auto',
+                fontSize: { xs: '1rem', md: '1.25rem' },
                 lineHeight: 1.6,
                 fontFamily: '"Be Vietnam Pro", sans-serif'
               }}
             >
-              Nền tảng quản lý hồ sơ y tế với công nghệ AI tiên tiến.
-              <br />
-              Chăm sóc sức khỏe của bạn một cách toàn diện và chuyên nghiệp.
+              NaviHealth giúp bạn lưu hồ sơ khám bệnh, đơn thuốc và xét nghiệm của cả gia đình – để mỗi lần đi khám không còn lúng túng.
             </Typography>
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} justifyContent="center">
+
+            <Stack spacing={2} sx={{ mb: 5 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                <CheckIcon sx={{ color: '#4caf50', fontSize: 28 }} />
+                <Typography sx={{ fontSize: '1.1rem', fontWeight: 500, color: '#2c3e50' }}>
+                  Chuẩn bị hồ sơ tái khám &lt; 2 phút
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                <CheckIcon sx={{ color: '#4caf50', fontSize: 28 }} />
+                <Typography sx={{ fontSize: '1.1rem', fontWeight: 500, color: '#2c3e50' }}>
+                  Mỗi người một hồ sơ – không lẩn đơn thuốc
+                </Typography>
+              </Box>
+            </Stack>
+
+            <Box>
               <Button
                 variant="contained"
                 size="large"
-                endIcon={<ArrowIcon />}
                 onClick={() => navigate('/register')}
                 sx={{
-                  bgcolor: 'white',
-                  color: '#1e73be',
-                  px: 5,
-                  py: 2,
-                  fontSize: '1.2rem',
-                  fontWeight: 700,
-                  borderRadius: 3,
-                  textTransform: 'none',
-                  boxShadow: '0 8px 20px rgba(0,0,0,0.15)',
-                  fontFamily: '"Be Vietnam Pro", sans-serif',
-                  '&:hover': {
-                    bgcolor: '#fee140',
-                    color: '#1e73be',
-                    transform: 'translateY(-3px)',
-                    boxShadow: '0 12px 28px rgba(0,0,0,0.2)'
-                  },
-                  transition: 'all 0.3s ease'
-                }}
-              >
-                Bắt Đầu Ngay
-              </Button>
-              <Button
-                variant="outlined"
-                size="large"
-                startIcon={<LoginIcon />}
-                onClick={() => navigate('/login')}
-                sx={{
-                  borderColor: 'white',
+                  bgcolor: '#1976d2',
                   color: 'white',
-                  px: 5,
-                  py: 2,
-                  fontSize: '1.2rem',
-                  fontWeight: 600,
-                  borderRadius: 3,
+                  px: 4,
+                  py: 1.8,
+                  fontSize: '1.1rem',
+                  fontWeight: 700,
+                  borderRadius: '12px',
                   textTransform: 'none',
-                  borderWidth: 2,
-                  fontFamily: '"Be Vietnam Pro", sans-serif',
+                  mb: 3,
                   '&:hover': {
-                    bgcolor: 'rgba(255,255,255,0.1)',
-                    borderColor: 'white',
-                    borderWidth: 2,
-                    transform: 'translateY(-3px)'
+                    bgcolor: '#1565c0',
+                    transform: 'translateY(-2px)'
                   },
                   transition: 'all 0.3s ease'
                 }}
               >
-                Đăng Nhập
+                Dùng thử miễn phí - không cần thẻ
               </Button>
-            </Stack>
+
+              <Typography
+                sx={{
+                  color: '#546e7a',
+                  fontSize: '1rem',
+                  fontWeight: 500
+                }}
+              >
+                Đã có tài khoản?{' '}
+                <Box
+                  component="span"
+                  onClick={() => navigate('/login')}
+                  sx={{
+                    color: '#1976d2',
+                    cursor: 'pointer',
+                    fontWeight: 700,
+                    '&:hover': { textDecoration: 'underline' }
+                  }}
+                >
+                  Đăng nhập
+                </Box>
+              </Typography>
+            </Box>
           </Box>
         </Container>
       </Box>
 
       {/* Features Section - Pure Flexbox */}
-      <Container maxWidth="lg" sx={{ py: { xs: 8, md: 12 } }}>
+      <Container id="features" maxWidth="lg" sx={{ py: { xs: 8, md: 12 } }}>
         <Box sx={{ textAlign: 'center', mb: 8 }}>
           <Typography
             variant="h2"
@@ -380,7 +455,7 @@ function Guest() {
       </Container>
 
       {/* Why Choose Section */}
-      <Box sx={{ bgcolor: 'white', py: { xs: 8, md: 12 } }}>
+      <Box id="benefits" sx={{ bgcolor: 'white', py: { xs: 8, md: 12 } }}>
         <Container maxWidth="lg">
           <Box
             sx={{
@@ -546,86 +621,197 @@ function Guest() {
             để quản lý sức khỏe của họ
           </Typography>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} justifyContent="center">
-            <Button
-              variant="contained"
-              size="large"
-              startIcon={<RegisterIcon />}
-              onClick={() => navigate('/register')}
-              sx={{
-                bgcolor: 'white',
-                color: '#1e73be',
-                px: 6,
-                py: 2.5,
-                fontSize: '1.2rem',
-                fontWeight: 700,
-                borderRadius: 3,
-                textTransform: 'none',
-                boxShadow: '0 8px 20px rgba(0,0,0,0.15)',
-                fontFamily: '"Be Vietnam Pro", sans-serif',
-                '&:hover': {
-                  bgcolor: '#fee140',
+            {isLoggedIn ? (
+              <Button
+                variant="contained"
+                size="large"
+                startIcon={<DashboardIcon />}
+                onClick={() => navigate('/health-records')}
+                sx={{
+                  bgcolor: 'white',
                   color: '#1e73be',
-                  transform: 'translateY(-3px)',
-                  boxShadow: '0 12px 28px rgba(0,0,0,0.2)'
-                },
-                transition: 'all 0.3s ease'
-              }}
-            >
-              Đăng Ký Miễn Phí
-            </Button>
-            <Button
-              variant="outlined"
-              size="large"
-              startIcon={<LoginIcon />}
-              onClick={() => navigate('/login')}
-              sx={{
-                borderColor: 'white',
-                color: 'white',
-                px: 6,
-                py: 2.5,
-                fontSize: '1.2rem',
-                fontWeight: 600,
-                borderRadius: 3,
-                textTransform: 'none',
-                borderWidth: 2,
-                fontFamily: '"Be Vietnam Pro", sans-serif',
-                '&:hover': {
-                  bgcolor: 'rgba(255,255,255,0.1)',
-                  borderColor: 'white',
-                  borderWidth: 2,
-                  transform: 'translateY(-3px)'
-                },
-                transition: 'all 0.3s ease'
-              }}
-            >
-              Đăng Nhập Ngay
-            </Button>
+                  px: 8,
+                  py: 2.5,
+                  fontSize: '1.2rem',
+                  fontWeight: 700,
+                  borderRadius: 3,
+                  textTransform: 'none',
+                  boxShadow: '0 8px 20px rgba(0,0,0,0.15)',
+                  fontFamily: '"Be Vietnam Pro", sans-serif',
+                  '&:hover': {
+                    bgcolor: '#fee140',
+                    color: '#1e73be',
+                    transform: 'translateY(-3px)',
+                    boxShadow: '0 12px 28px rgba(0,0,0,0.2)'
+                  },
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                Truy Cập Hồ Sơ Sức Khỏe
+              </Button>
+            ) : (
+              <>
+                <Button
+                  variant="contained"
+                  size="large"
+                  startIcon={<RegisterIcon />}
+                  onClick={() => navigate('/register')}
+                  sx={{
+                    bgcolor: 'white',
+                    color: '#1e73be',
+                    px: 6,
+                    py: 2.5,
+                    fontSize: '1.2rem',
+                    fontWeight: 700,
+                    borderRadius: 3,
+                    textTransform: 'none',
+                    boxShadow: '0 8px 20px rgba(0,0,0,0.15)',
+                    fontFamily: '"Be Vietnam Pro", sans-serif',
+                    '&:hover': {
+                      bgcolor: '#fee140',
+                      color: '#1e73be',
+                      transform: 'translateY(-3px)',
+                      boxShadow: '0 12px 28px rgba(0,0,0,0.2)'
+                    },
+                    transition: 'all 0.3s ease'
+                  }}
+                >
+                  Đăng Ký Miễn Phí
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="large"
+                  startIcon={<LoginIcon />}
+                  onClick={() => navigate('/login')}
+                  sx={{
+                    borderColor: 'white',
+                    color: 'white',
+                    px: 6,
+                    py: 2.5,
+                    fontSize: '1.2rem',
+                    fontWeight: 600,
+                    borderRadius: 3,
+                    textTransform: 'none',
+                    borderWidth: 2,
+                    fontFamily: '"Be Vietnam Pro", sans-serif',
+                    '&:hover': {
+                      bgcolor: 'rgba(255,255,255,0.1)',
+                      borderColor: 'white',
+                      borderWidth: 2,
+                      transform: 'translateY(-3px)'
+                    },
+                    transition: 'all 0.3s ease'
+                  }}
+                >
+                  Đăng Nhập Ngay
+                </Button>
+              </>
+            )}
           </Stack>
         </Container>
       </Box>
 
       {/* Footer */}
-      <Box sx={{ bgcolor: '#1a1a2e', color: 'white', py: 4, textAlign: 'center' }}>
+      <Box sx={{ bgcolor: '#1a1a2e', color: 'white', py: 6 }}>
         <Container maxWidth="lg">
-          <Typography
-            variant="body1"
-            sx={{
-              opacity: 0.7,
-              mb: 1,
-              fontFamily: '"Be Vietnam Pro", sans-serif'
-            }}
+          <Stack
+            direction={{ xs: 'column', md: 'row' }}
+            justifyContent="space-between"
+            alignItems={{ xs: 'center', md: 'flex-start' }}
+            spacing={4}
+            sx={{ mb: 4 }}
           >
-            © 2026 NaviHealth. All rights reserved.
-          </Typography>
-          <Typography
-            variant="body2"
-            sx={{
-              opacity: 0.5,
-              fontFamily: '"Be Vietnam Pro", sans-serif'
-            }}
-          >
-            Made with ❤️ for your health
-          </Typography>
+            {/* Logo & Slogan */}
+            <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
+              <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2, justifyContent: { xs: 'center', md: 'flex-start' } }}>
+                <Box sx={{ bgcolor: '#1976d2', borderRadius: 1.5, p: 0.5, display: 'flex' }}>
+                  <HealthIcon sx={{ color: 'white', fontSize: 24 }} />
+                </Box>
+                <Typography variant="h6" sx={{ fontWeight: 700, letterSpacing: '-0.5px' }}>
+                  NaviHealth
+                </Typography>
+              </Stack>
+              <Typography variant="body2" sx={{ opacity: 0.7, maxWidth: 300 }}>
+                Sức khỏe trong tầm tay - Đồng hành cùng gia đình bạn trên hành trình chăm sóc sức khỏe chủ động.
+              </Typography>
+            </Box>
+
+            {/* Contact Info */}
+            <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2 }}>
+                Liên hệ với chúng tôi
+              </Typography>
+              <Stack spacing={1.5} alignItems={{ xs: 'center', md: 'flex-start' }}>
+                <Link href="tel:0971687208" sx={{ color: 'inherit', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 1, opacity: 0.8, '&:hover': { opacity: 1 } }}>
+                  <PhoneIcon fontSize="small" />
+                  <Typography variant="body2">097 168 72 08</Typography>
+                </Link>
+                <Link href="mailto:navihealthsuckhoetrongtamtay@gmail.com" sx={{ color: 'inherit', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 1, opacity: 0.8, '&:hover': { opacity: 1 } }}>
+                  <EmailIcon fontSize="small" />
+                  <Typography variant="body2">navihealthsuckhoetrongtamtay@gmail.com</Typography>
+                </Link>
+              </Stack>
+            </Box>
+
+            {/* Social Links */}
+            <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2 }}>
+                Theo dõi chúng tôi
+              </Typography>
+              <Stack direction="row" spacing={1} justifyContent={{ xs: 'center', md: 'flex-start' }}>
+                <IconButton
+                  component="a"
+                  href="https://www.facebook.com/profile.php?id=61587293396443"
+                  target="_blank"
+                  sx={{
+                    color: 'white',
+                    bgcolor: 'rgba(255,255,255,0.1)',
+                    '&:hover': { bgcolor: '#1877f2', transform: 'translateY(-3px)' },
+                    transition: 'all 0.3s ease'
+                  }}
+                >
+                  <FacebookIcon />
+                </IconButton>
+                <IconButton
+                  component="a"
+                  href="https://instagram.com/NaviHealth"
+                  target="_blank"
+                  sx={{
+                    color: 'white',
+                    bgcolor: 'rgba(255,255,255,0.1)',
+                    '&:hover': { bgcolor: '#e4405f', transform: 'translateY(-3px)' },
+                    transition: 'all 0.3s ease'
+                  }}
+                >
+                  <InstagramIcon />
+                </IconButton>
+                <IconButton
+                  component="a"
+                  href="https://tiktok.com/@NaviHealth"
+                  target="_blank"
+                  sx={{
+                    color: 'white',
+                    bgcolor: 'rgba(255,255,255,0.1)',
+                    '&:hover': { bgcolor: '#000000', transform: 'translateY(-3px)' },
+                    transition: 'all 0.3s ease'
+                  }}
+                >
+                  <TikTokIcon />
+                </IconButton>
+              </Stack>
+            </Box>
+          </Stack>
+
+          <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)', mb: 4 }} />
+
+          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', alignItems: 'center', gap: 2 }}>
+            <Typography variant="body2" sx={{ opacity: 0.5, fontFamily: '"Be Vietnam Pro", sans-serif' }}>
+              © 2026 NaviHealth. All rights reserved.
+            </Typography>
+            <Typography variant="body2" sx={{ opacity: 0.5, display: 'flex', alignItems: 'center', gap: 0.5, fontFamily: '"Be Vietnam Pro", sans-serif' }}>
+              Made with ❤️ for your health
+            </Typography>
+          </Box>
         </Container>
       </Box>
     </Box>

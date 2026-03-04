@@ -9,7 +9,6 @@ export default function requestApi(endpoint, method, body, responseType = 'json'
     (config) => {
       const token = localStorage.getItem('accessToken')
       if (token) {
-        console.log(token)
         config.headers['Authorization'] = `Bearer ${token}`
       }
       return config
@@ -52,11 +51,22 @@ export default function requestApi(endpoint, method, body, responseType = 'json'
           if (error.response || error.response.status === 401) {
             localStorage.removeItem('accessToken')
             localStorage.removeItem('refreshToken')
-            window.location.href = 'http://222.255.180.18/login'
+            window.location.href = 'https://navi-health.site/login'
           }
           return Promise.reject(error)
         }
       }
+
+      // 403 Handling for Plan Limits
+      if (error.response && error.response.status === 403) {
+        window.dispatchEvent(new CustomEvent('show-notification', {
+          detail: {
+            message: "Bạn đã vượt quá giới hạn của gói hiện tại. Vui lòng nâng cấp để tiếp tục!",
+            severity: "warning"
+          }
+        }));
+      }
+
       return Promise.reject(error)
     }
   )

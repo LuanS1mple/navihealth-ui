@@ -21,7 +21,7 @@ import { UserPlus } from "lucide-react";
 export default function Register() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    fullname: "",
+    username: "",
     email: "",
     phone: "",
     password: "",
@@ -36,7 +36,7 @@ export default function Register() {
   };
 
   const validateForm = () => {
-    if (!formData.fullname || !formData.email || !formData.password || !formData.confirmPassword) {
+    if (!formData.username || !formData.email || !formData.password || !formData.confirmPassword) {
       setError("Vui lòng điền đầy đủ thông tin");
       return false;
     }
@@ -62,7 +62,7 @@ export default function Register() {
     setLoading(true);
     try {
       await requestApi("auth/register", "POST", {
-        username: formData.fullname,
+        username: formData.username,
         email: formData.email,
         password: formData.password
       });
@@ -143,8 +143,8 @@ export default function Register() {
 
                 <Stack spacing={2.5}>
                   <Box>
-                    <Typography variant="caption" sx={{ ml: 1, fontWeight: 700, color: '#475569' }}>HỌ VÀ TÊN</Typography>
-                    <TextField fullWidth placeholder="Nguyễn Văn A" value={formData.fullname} onChange={handleInputChange("fullname")} sx={{ mt: 0.5 }} />
+                    <Typography variant="caption" sx={{ ml: 1, fontWeight: 700, color: '#475569' }}>USERNAME</Typography>
+                    <TextField fullWidth placeholder="Nhập username" value={formData.username} onChange={handleInputChange("username")} sx={{ mt: 0.5 }} />
                   </Box>
 
                   <Box>

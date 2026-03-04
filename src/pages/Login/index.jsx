@@ -18,7 +18,7 @@ import { useNavigate } from "react-router-dom";
 import { Zap } from "lucide-react";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -30,14 +30,14 @@ export default function Login() {
     setError("");
     try {
       await requestApi('auth/login', 'POST', {
-        username: email,
+        username: username,
         password: password
       });
       navigate('/health-records');
     } catch (err) {
       console.error(err);
       if (err.response?.data?.error === "Unauthorized") {
-        setError("Email hoặc mật khẩu không đúng. Vui lòng nhập lại.");
+        setError("Tên đăng nhập hoặc mật khẩu không đúng. Vui lòng nhập lại.");
       } else {
         setError("Đăng nhập thất bại. Vui lòng thử lại sau.");
       }
@@ -114,12 +114,12 @@ export default function Login() {
 
                 <Stack spacing={2.5}>
                   <Box>
-                    <Typography variant="caption" sx={{ ml: 1, fontWeight: 700, color: '#475569' }}>EMAIL</Typography>
+                    <Typography variant="caption" sx={{ ml: 1, fontWeight: 700, color: '#475569' }}>USERNAME</Typography>
                     <TextField
                       fullWidth
-                      placeholder="email@example.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Nhập username"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
                       sx={{ mt: 0.5 }}
                     />
                   </Box>

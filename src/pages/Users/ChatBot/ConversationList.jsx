@@ -131,7 +131,7 @@ const ConversationList = ({ conversations, currentId, onSelect, onNewChat, onDel
                     color: isSelected ? '#004aad' : '#334155',
                     noWrap: true,
                   }}
-                  secondaryTypographyProps={{ fontSize: '10px', color: '#94a3b8' }}
+                  secondaryTypographyProps={{ fontSize: '10px', color: '#94a3b8', component: 'div' }}
                 />
 
                 <Fade in={hoverId === convo.conversationId || isSelected}>

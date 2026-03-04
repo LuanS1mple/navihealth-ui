@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -12,7 +12,9 @@ import {
   ListItemText,
   Chip,
   useTheme,
-  Divider
+  Divider,
+  CircularProgress,
+  Paper
 } from '@mui/material';
 import {
   CheckCircle,
@@ -21,9 +23,12 @@ import {
   Psychology,
   NotificationsActive,
 } from '@mui/icons-material';
+import requestApi from '../../../apis/apis';
+import { PAYOS_CREATE } from '../../../constants/apis';
 
 const plans = [
   {
+    planCode: 'FREE',
     title: 'FREE',
     duration: '1 tháng',
     price: '0đ',
@@ -42,6 +47,7 @@ const plans = [
     buttonVariant: 'outlined'
   },
   {
+    planCode: 'ONE_MONTH',
     title: 'Gói 1 tháng',
     duration: '1 tháng',
     price: '84.000đ',
@@ -61,6 +67,7 @@ const plans = [
     buttonVariant: 'outlined'
   },
   {
+    planCode: 'TWO_MONTHS',
     title: 'Gói 2 tháng',
     duration: '2 tháng',
     price: '149.000đ',
@@ -80,6 +87,7 @@ const plans = [
     buttonVariant: 'contained'
   },
   {
+    planCode: 'THREE_MONTHS',
     title: 'Gói 3 tháng',
     duration: '3 tháng',
     price: '189.000đ',
@@ -99,6 +107,7 @@ const plans = [
     buttonVariant: 'outlined'
   },
   {
+    planCode: 'SIX_MONTHS',
     title: 'Gói 6 tháng',
     duration: '6 tháng',
     price: '299.000đ',
@@ -121,6 +130,51 @@ const plans = [
 
 function ServicePlans() {
   const theme = useTheme();
+  const [loadingCode, setLoadingCode] = useState(null);
+  const [currentSub, setCurrentSub] = useState(null);
+
+  useEffect(() => {
+    fetchCurrentSubscription();
+  }, []);
+
+  const fetchCurrentSubscription = async () => {
+    try {
+      const response = await requestApi('subscriptions/my-subscription', 'GET');
+      if (response.data.success) {
+        setCurrentSub(response.data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching sub:", error);
+    }
+  };
+
+  const handleSubscribe = async (planCode, price) => {
+    if (price === '0đ') {
+      alert("Bạn đang sử dụng gói này!");
+      return;
+    }
+
+    if (currentSub && currentSub.planCode === planCode && currentSub.isActive) {
+      alert("Bạn đã đăng ký gói này rồi!");
+      return;
+    }
+
+    setLoadingCode(planCode);
+    try {
+      const response = await requestApi(PAYOS_CREATE, 'POST', { planCode });
+      if (response.data.success) {
+        // Redirect to PayOS checkout page
+        window.location.href = response.data.data.checkoutUrl;
+      } else {
+        alert("Lỗi khi tạo yêu cầu thanh toán. Vui lòng thử lại.");
+      }
+    } catch (error) {
+      console.error("Payment error:", error);
+      alert("Lỗi kết nối máy chủ. Vui lòng thử lại sau.");
+    } finally {
+      setLoadingCode(null);
+    }
+  };
 
   return (
     <Box sx={{ p: 0, width: '100%' }}>
@@ -134,6 +188,28 @@ function ServicePlans() {
         <Typography variant="h3" className="gradient-text" sx={{ fontWeight: 'bold', mb: 2 }}>
           Lựa chọn gói dịch vụ phù hợp
         </Typography>
+
+        {currentSub && (
+          <Paper sx={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            px: 3,
+            py: 1.5,
+            mb: 3,
+            borderRadius: 4,
+            bgcolor: 'rgba(0, 74, 173, 0.05)',
+            border: '1px solid rgba(0, 74, 173, 0.1)'
+          }}>
+            <Typography variant="body2" sx={{ mr: 1, color: 'text.secondary' }}>Gói hiện tại:</Typography>
+            <Typography variant="body1" fontWeight="bold" color="primary">{currentSub.planName}</Typography>
+            {currentSub.endDate && (
+              <Typography variant="caption" sx={{ ml: 2, color: 'text.secondary' }}>
+                Hết hạn: {new Date(currentSub.endDate).toLocaleDateString()}
+              </Typography>
+            )}
+          </Paper>
+        )}
+
         <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 600, mx: 'auto' }}>
           Tăng giới hạn lưu trữ hồ sơ, số lượng câu hỏi AI và nhắc nhở thuốc.
           Hãy chọn gói phù hợp nhất với nhu cầu chăm sóc sức khỏe của bạn.
@@ -224,6 +300,8 @@ function ServicePlans() {
                   variant={plan.buttonVariant}
                   color="primary"
                   size="large"
+                  disabled={loadingCode === plan.planCode}
+                  onClick={() => handleSubscribe(plan.planCode, plan.price)}
                   sx={{
                     borderRadius: '12px',
                     fontWeight: 700,
@@ -232,7 +310,11 @@ function ServicePlans() {
                     mt: 'auto'
                   }}
                 >
-                  {plan.price === '0đ' ? 'Dùng thử ngay' : 'Đăng ký ngay'}
+                  {loadingCode === plan.planCode ? (
+                    <CircularProgress size={24} color="inherit" />
+                  ) : (
+                    plan.price === '0đ' ? 'Dùng thử ngay' : 'Đăng ký ngay'
+                  )}
                 </Button>
               </CardContent>
             </Card>

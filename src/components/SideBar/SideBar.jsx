@@ -27,12 +27,11 @@ function SideBar({ onClose }) {
   const location = useLocation();
 
   const menuItems = [
-    { text: 'Trang chủ', icon: Home, path: '/main' },
+    // { text: 'Trang chủ', icon: Home, path: '/main' },
     { text: 'Hồ sơ sức khỏe', icon: Description, path: '/health-records' },
     { text: 'AI Sức khỏe', icon: Psychology, path: '/chatbot' },
     { text: 'Quản lý nhắc nhở', icon: NotificationsActive, path: '/reminders' },
     { text: 'Gói dịch vụ', icon: ShoppingBag, path: '/services' },
-    { text: 'Trợ giúp / Hỗ trợ', icon: HelpOutline, path: '/support' },
     { text: 'Phản hồi', icon: Feedback, path: '/feedback' },
   ];
 

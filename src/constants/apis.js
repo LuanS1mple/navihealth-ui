@@ -1,3 +1,4 @@
+// export const DOMAIN_API = 'https://navi-health.site/api/'
 export const DOMAIN_API = 'http://localhost:5062/api/'
 export const UPLOAD_API = 'medical-record/extract'
 export const SAVE_RECORD = 'medical-record/save'
@@ -19,3 +20,28 @@ export const GET_CHAT_HISTORY = 'chat/history/'
 
 // Reminder APIs
 export const REMINDERS = 'reminders'
+
+// Comparison APIs
+export const COMPARE_RECORDS = 'medical/compare'
+
+// Feedback APIs
+export const FEEDBACK = 'feedback'
+
+// PayOS APIs
+export const PAYOS_CREATE = 'payos/create'
+export const PAYOS_GET_TRANSACTION = 'payos/transaction/'
+
+// Admin Dashboard APIs
+export const ADMIN_BUSINESS_KPIS = 'admin_check/business-kpis'
+export const ADMIN_REVENUE_CHART = 'admin_check/revenue-chart'
+export const ADMIN_PLAN_DISTRIBUTION = 'admin_check/plan-distribution'
+export const ADMIN_RECENT_TRANSACTIONS = 'admin_check/recent-transactions'
+export const ADMIN_DASHBOARD_STATS = 'admin_check/dashboard-stats'
+export const ADMIN_RECENT_LOGINS = 'admin_check/recent-logins'
+export const ADMIN_VISITOR_STATS = 'admin_check/visitor-stats'
+// Share Record APIs
+export const SHARE_RECORD = 'medical-record/share/'
+export const VIEW_SHARED_RECORD = 'medical-record/share/view/'
+export const DOWNLOAD_SHARED_RECORD = 'medical-record/share/download/'
+export const MY_SHARE_CODES = 'medical-record/share/my-codes'
+export const REVOKE_SHARE_CODE = 'medical-record/share/'

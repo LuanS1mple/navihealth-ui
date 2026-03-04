@@ -10,8 +10,12 @@ import {
   Fade,
   InputAdornment,
   Tooltip,
+  useMediaQuery,
+  useTheme,
+  Drawer,
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
+import MenuIcon from '@mui/icons-material/Menu';
 import {
   Sparkles as SparklesIcon,
   User as UserIcon,
@@ -34,7 +38,15 @@ function ChatBot() {
   const [currentConvoId, setCurrentConvoId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [fetchingHistory, setFetchingHistory] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const messagesEndRef = useRef(null);
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -163,21 +175,50 @@ function ChatBot() {
       className="page-transition"
       sx={{
         display: 'flex',
-        height: 'calc(100vh - 120px)',
-        borderRadius: '24px',
+        height: isMobile ? 'calc(100vh - 80px)' : 'calc(100vh - 120px)',
+        borderRadius: isMobile ? '0' : '24px',
         overflow: 'hidden',
-        boxShadow: '0 20px 60px rgba(0, 74, 173, 0.1)',
+        boxShadow: isMobile ? 'none' : '0 20px 60px rgba(0, 74, 173, 0.1)',
         bgcolor: 'white',
-        border: '1px solid rgba(134, 203, 222, 0.2)',
+        border: isMobile ? 'none' : '1px solid rgba(134, 203, 222, 0.2)',
+        mx: isMobile ? -1 : 0, // Bù trừ padding của MainLayout trên mobile nếu cần
       }}
     >
-      <ConversationList
-        conversations={conversations}
-        currentId={currentConvoId}
-        onSelect={setCurrentConvoId}
-        onNewChat={handleNewChat}
-        onDelete={handleDeleteChat}
-      />
+      {/* Sidebar for Desktop / Drawer for Mobile */}
+      {!isMobile ? (
+        <ConversationList
+          conversations={conversations}
+          currentId={currentConvoId}
+          onSelect={setCurrentConvoId}
+          onNewChat={handleNewChat}
+          onDelete={handleDeleteChat}
+        />
+      ) : (
+        <Drawer
+          variant="temporary"
+          open={mobileOpen}
+          onClose={handleDrawerToggle}
+          ModalProps={{ keepMounted: true }}
+          sx={{
+            display: { xs: 'block', md: 'none' },
+            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: 280 },
+          }}
+        >
+          <ConversationList
+            conversations={conversations}
+            currentId={currentConvoId}
+            onSelect={(id) => {
+              setCurrentConvoId(id);
+              handleDrawerToggle();
+            }}
+            onNewChat={() => {
+              handleNewChat();
+              handleDrawerToggle();
+            }}
+            onDelete={handleDeleteChat}
+          />
+        </Drawer>
+      )}
 
       <Box
         sx={{
@@ -186,6 +227,7 @@ function ChatBot() {
           flexDirection: 'column',
           bgcolor: '#fff',
           position: 'relative',
+          width: '100%',
         }}
       >
         {/* Chat Header / Info Bar */}
@@ -202,28 +244,33 @@ function ChatBot() {
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            {isMobile && (
+              <IconButton onClick={handleDrawerToggle} sx={{ mr: 0.5, color: '#004aad' }}>
+                <MenuIcon />
+              </IconButton>
+            )}
             <Avatar
               sx={{
-                width: 40,
-                height: 40,
+                width: isMobile ? 32 : 40,
+                height: isMobile ? 32 : 40,
                 background: 'linear-gradient(135deg, #519db1 0%, #004aad 100%)',
                 boxShadow: '0 4px 10px rgba(0, 74, 173, 0.2)'
               }}
             >
-              <Zap size={20} fill="white" />
+              <Zap size={isMobile ? 16 : 20} fill="white" />
             </Avatar>
             <Box>
-              <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#004aad', lineHeight: 1.2 }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#004aad', lineHeight: 1.2, fontSize: isMobile ? '12px' : '14px' }}>
                 NAVI HEALTH AI
               </Typography>
-              <Typography variant="caption" sx={{ color: '#10b981', display: 'flex', alignItems: 'center', gap: 0.5, fontWeight: 600 }}>
+              <Typography variant="caption" sx={{ color: '#10b981', display: 'flex', alignItems: 'center', gap: 0.5, fontWeight: 600, fontSize: isMobile ? '9px' : '11px' }}>
                 <Box sx={{ width: 6, height: 6, bgcolor: '#10b981', borderRadius: '50%' }} />
                 Đang trực tuyến
               </Typography>
             </Box>
           </Box>
           <Tooltip title="AI được cá nhân hóa dựa trên hồ sơ sức khỏe của bạn">
-            <IconButton size="small"><Info size={16} color="#94a3b8" /></IconButton>
+            <IconButton size="small"><Info size={isMobile ? 14 : 16} color="#94a3b8" /></IconButton>
           </Tooltip>
         </Box>
 
@@ -232,10 +279,10 @@ function ChatBot() {
           sx={{
             flex: 1,
             overflowY: 'auto',
-            p: { xs: 2, md: 4 },
+            p: { xs: 1.5, md: 4 },
             display: 'flex',
             flexDirection: 'column',
-            gap: 3,
+            gap: isMobile ? 2 : 3,
             background: 'radial-gradient(circle at 50% 50%, rgba(81, 157, 177, 0.02) 0%, transparent 100%)',
           }}
         >
@@ -269,11 +316,11 @@ function ChatBot() {
                       </Avatar>
                     )}
 
-                    <Box sx={{ maxWidth: '75%', display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                    <Box sx={{ maxWidth: isMobile ? '90%' : '75%', display: 'flex', flexDirection: 'column', gap: 0.5 }}>
                       <Paper
                         elevation={0}
                         sx={{
-                          p: '14px 20px',
+                          p: isMobile ? '10px 16px' : '14px 20px',
                           background:
                             msg.role === 'user'
                               ? 'linear-gradient(135deg, #519db1 0%, #004aad 100%)'
@@ -286,7 +333,7 @@ function ChatBot() {
                       >
                         <Typography
                           sx={{
-                            fontSize: '14.5px',
+                            fontSize: isMobile ? '13.5px' : '14.5px',
                             lineHeight: 1.6,
                             fontWeight: msg.role === 'user' ? 500 : 400,
                             letterSpacing: '0.01em'
@@ -355,14 +402,14 @@ function ChatBot() {
         </Box>
 
         {/* Improved Input Area */}
-        <Box sx={{ p: { xs: 2, md: 3 }, bgcolor: 'white' }}>
+        <Box sx={{ p: isMobile ? 1.5 : 3, bgcolor: 'white' }}>
           <Box
             sx={{
               display: 'flex',
               alignItems: 'flex-end',
-              gap: 1.5,
-              p: 1.5,
-              borderRadius: '20px',
+              gap: isMobile ? 1 : 1.5,
+              p: isMobile ? 1 : 1.5,
+              borderRadius: isMobile ? '16px' : '20px',
               bgcolor: '#f8fafc',
               border: '1px solid rgba(134, 203, 222, 0.2)',
               transition: 'all 0.3s ease',
@@ -373,11 +420,11 @@ function ChatBot() {
               }
             }}
           >
-            <IconButton size="small" sx={{ color: '#94a3b8', mb: 0.5 }}><Paperclip size={20} /></IconButton>
+            <IconButton size="small" sx={{ color: '#94a3b8', mb: 0.5 }}><Paperclip size={isMobile ? 18 : 20} /></IconButton>
             <TextField
               fullWidth
               multiline
-              maxRows={6}
+              maxRows={isMobile ? 4 : 6}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               onKeyDown={(e) => {
@@ -386,14 +433,14 @@ function ChatBot() {
                   handleSendMessage();
                 }
               }}
-              placeholder="Hỏi AI về kết quả xét nghiệm hoặc tư vấn sức khỏe..."
+              placeholder={isMobile ? "Hỏi AI..." : "Hỏi AI về kết quả xét nghiệm hoặc tư vấn sức khỏe..."}
               variant="standard"
               InputProps={{
                 disableUnderline: true,
                 sx: {
-                  fontSize: '14.5px',
+                  fontSize: isMobile ? '13.5px' : '14.5px',
                   fontFamily: 'Arimo, sans-serif',
-                  py: 1
+                  py: isMobile ? 0.5 : 1
                 }
               }}
               disabled={loading}
@@ -405,13 +452,13 @@ function ChatBot() {
                 mb: 0.5,
                 background: 'linear-gradient(135deg, #519db1 0%, #004aad 100%)',
                 color: 'white',
-                width: 40,
-                height: 40,
+                width: isMobile ? 36 : 40,
+                height: isMobile ? 36 : 40,
                 '&:hover': { transform: 'scale(1.05)', opacity: 0.9 },
                 '&:disabled': { background: '#e2e8f0', color: '#94a3b8' },
               }}
             >
-              {loading ? <CircularProgress size={20} color="inherit" /> : <SendIcon sx={{ fontSize: 20 }} />}
+              {loading ? <CircularProgress size={20} color="inherit" /> : <SendIcon sx={{ fontSize: isMobile ? 18 : 20 }} />}
             </IconButton>
           </Box>
           <Typography variant="caption" sx={{ display: 'block', textAlign: 'center', mt: 1.5, color: '#94a3b8', fontSize: '10px' }}>
