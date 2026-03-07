@@ -22,6 +22,7 @@ import Reminder from './Reminder/Reminder';
 import ReminderModal from './ReminderModal';
 import requestApi from '../../../apis/apis';
 import { REMINDERS } from '../../../constants/apis';
+import { trackEvent, GA_EVENTS } from '../../../utils/analytics';
 
 function ReminderList() {
   const [reminders, setReminders] = useState([]);
@@ -68,6 +69,7 @@ function ReminderList() {
       } else {
         // Create
         await requestApi(REMINDERS, 'POST', data);
+        trackEvent(GA_EVENTS.CREATE_REMINDER);
       }
       setModalOpen(false);
       fetchReminders();

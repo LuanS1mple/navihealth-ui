@@ -1,5 +1,8 @@
 // export const DOMAIN_API = 'https://navi-health.site/api/'
 export const DOMAIN_API = 'http://localhost:5062/api/'
+export const CREATE_VISIT = 'medical-record/visit'
+export const PREVIEW_AI = 'medical-record/' // + {visitId}/preview-ai
+export const CONFIRM_SAVE = 'medical-record/' // + {visitId}/confirm-save
 export const UPLOAD_API = 'medical-record/extract'
 export const SAVE_RECORD = 'medical-record/save'
 export const SEND_EMAIL_RESET = 'auth/forgot-password'
@@ -23,9 +26,12 @@ export const REMINDERS = 'reminders'
 
 // Comparison APIs
 export const COMPARE_RECORDS = 'medical/compare'
+export const COMPARE_HISTORY = 'medical/compare/history'
+export const COMPARE_DETAIL = 'medical/compare/history/'
 
 // Feedback APIs
 export const FEEDBACK = 'feedback'
+export const MY_FEEDBACKS = 'feedback/my-feedbacks'
 
 // PayOS APIs
 export const PAYOS_CREATE = 'payos/create'

@@ -15,6 +15,8 @@ import {
   Trash2,
   Download,
   Share2,
+  PlusCircle,
+  Camera
 } from 'lucide-react';
 
 import requestApi from '../../apis/apis';
@@ -23,19 +25,6 @@ import { DOWNLOAD_RECORD } from '../../constants/apis';
 /* =========================
    HELPERS
 ========================= */
-const mapRecordType = (type) => {
-  switch (type) {
-    case 'Imaging':
-      return 'Hình ảnh y khoa';
-    case 'Lab':
-      return 'Kết quả xét nghiệm';
-    case 'Prescription':
-      return 'Đơn thuốc';
-    default:
-      return 'Khác';
-  }
-};
-
 const formatDate = (iso) => {
   if (!iso) return '';
   return new Date(iso).toLocaleDateString('vi-VN');
@@ -44,40 +33,12 @@ const formatDate = (iso) => {
 /* =========================
    COMPONENT
 ========================= */
-function HealthRecord({ record, onView, onEdit, onDelete, onShare, selectable, selected, onSelect }) {
+function HealthRecord({ record, onView, onEdit, onDelete, onShare, onAddRecords, onAddCamera, selectable, selected, onSelect }) {
 
-  const recordTypeText = mapRecordType(record.record_type);
-
-  const getBadgeColor = (type) => {
-    switch (type) {
-      case '"Imaging"':
-        return { bg: '#dbeafe', color: '#1447e6', border: '#bedbff' };
-      case 'Đơn thuốc':
-        return { bg: '#dcfce7', color: '#008236', border: '#b9f8cf' };
-      case 'Hình ảnh y khoa':
-        return { bg: '#fef3c7', color: '#b45309', border: '#fde68a' };
-      default:
-        return { bg: '#f3f4f6', color: '#374151', border: '#e5e7eb' };
-    }
-  };
-
-  const badgeStyle = getBadgeColor(recordTypeText);
+  const badgeStyle = { bg: 'rgba(81, 157, 177, 0.1)', color: '#519db1', border: 'rgba(81, 157, 177, 0.2)' };
 
   const handleDownload = async () => {
-    try {
-      const response = await requestApi(`${DOWNLOAD_RECORD}${record.id || record._id}.pdf`, 'GET', null, 'blob');
-      const blob = new Blob([response.data], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `HealthRecord_${record.id || record._id}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      link.parentNode.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error downloading file:', error);
-    }
+    alert("Vui lòng vào chi tiết hồ sơ để tải từng bản PDF hoặc sử dụng tính năng Chia sẻ để tải bộ hồ sơ.");
   };
 
   return (
@@ -147,20 +108,20 @@ function HealthRecord({ record, onView, onEdit, onDelete, onShare, selectable, s
                 <Typography
                   sx={{
                     fontSize: '16px',
-                    fontWeight: 700,
+                    fontWeight: 800,
                     color: '#004aad',
                   }}
                 >
-                  {recordTypeText}
+                  {record.record_name || "Bộ hồ sơ không tên"}
                 </Typography>
 
                 <Chip
-                  label={recordTypeText}
+                  label={`${record.record_count || 0} hồ sơ con`}
                   size="small"
                   sx={{
                     height: '24px',
                     fontSize: '12px',
-                    fontWeight: 500,
+                    fontWeight: 600,
                     backgroundColor: badgeStyle.bg,
                     color: badgeStyle.color,
                     border: `1px solid ${badgeStyle.border}`,
@@ -169,37 +130,23 @@ function HealthRecord({ record, onView, onEdit, onDelete, onShare, selectable, s
                 />
               </Box>
 
+              {/* HOSPITAL */}
+              <Typography sx={{ fontWeight: 600, color: '#475569', fontSize: '14px', mb: 0.5 }}>
+                Bệnh viện: {record.hospital_name || "Chưa xác định"}
+              </Typography>
+
               {/* DATE */}
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
                 <Calendar size={14} color="#64748b" />
                 <Typography sx={{ fontSize: '13px', color: '#64748b', fontWeight: 500 }}>
-                  {formatDate(record.created_at)}
+                  Ngày khám: {formatDate(record.visit_date)}
                 </Typography>
               </Box>
 
               {/* SUMMARY */}
-              <Typography sx={{ fontSize: '14px', color: '#4a5565', mb: 1, lineHeight: 1.5 }}>
-                {record.ai_summary}
+              <Typography sx={{ fontSize: '14px', color: '#1e293b', mb: 1, lineHeight: 1.5, fontWeight: 500 }}>
+                Chẩn đoán: {record.general_diagnosis || "Đang phân tích..."}
               </Typography>
-
-              {/* PDF LINK */}
-              {record.pdf_url && (
-                <Typography
-                  component="span"
-                  sx={{
-                    fontSize: '13px',
-                    color: '#2563eb',
-                    fontWeight: 500,
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 0.5,
-                    '&:hover': { textDecoration: 'underline' }
-                  }}
-                  onClick={() => window.open(record.pdf_url, '_blank')}
-                >
-                </Typography>
-              )}
             </Box>
           </Box>
 
@@ -208,11 +155,13 @@ function HealthRecord({ record, onView, onEdit, onDelete, onShare, selectable, s
             <Box sx={{
               display: 'flex',
               gap: 1,
+              flexWrap: 'wrap',
               alignItems: { xs: 'flex-start', sm: 'flex-start' },
               justifyContent: { xs: 'flex-end', sm: 'flex-start' },
               borderTop: { xs: '1px solid #f1f5f9', sm: 'none' },
               pt: { xs: 2, sm: 0 },
-              mt: { xs: 1, sm: 0 }
+              mt: { xs: 1, sm: 0 },
+              maxWidth: { xs: '100%', sm: '200px' }
             }}>
               <IconButton
                 size="small"
@@ -229,6 +178,7 @@ function HealthRecord({ record, onView, onEdit, onDelete, onShare, selectable, s
 
               <IconButton
                 size="small"
+                title="Xem chi tiết"
                 sx={{
                   width: '36px', height: '36px', borderRadius: '10px',
                   bgcolor: '#f8fafc', border: '1px solid #e2e8f0',
@@ -241,18 +191,7 @@ function HealthRecord({ record, onView, onEdit, onDelete, onShare, selectable, s
 
               <IconButton
                 size="small"
-                sx={{
-                  width: '36px', height: '36px', borderRadius: '10px',
-                  bgcolor: '#f0fdf4', border: '1px solid #dcfce7',
-                  '&:hover': { bgcolor: '#dcfce7', borderColor: '#bbf7d0' }
-                }}
-                onClick={(e) => { e.stopPropagation(); handleDownload(); }}
-              >
-                <Download size={18} color="#16a34a" />
-              </IconButton>
-
-              <IconButton
-                size="small"
+                title="Xóa bộ hồ sơ"
                 sx={{
                   width: '36px', height: '36px', borderRadius: '10px',
                   bgcolor: '#fef2f2', border: '1px solid #fee2e2',

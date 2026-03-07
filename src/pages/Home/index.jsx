@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Box } from "@mui/material";
 import { AppFooter } from "../../components/Homes/AppFooter";
 import { BenefitsInfo } from "../../components/Homes/BenefitsInfo";
@@ -6,8 +7,13 @@ import { FeatureGrid } from "../../components/Homes/FeatureGrid";
 import { FeatureOverview } from "../../components/Homes/FeatureOverview";
 import { HeadBar } from "../../components/Homes/HeroIntro";
 import { ThemeProvider } from "../../theme";
+import { trackEvent, GA_EVENTS } from "../../utils/analytics";
 
 const NaviHealth = () => {
+  useEffect(() => {
+    trackEvent(GA_EVENTS.VIEW_HOME);
+  }, []);
+
   return (
     <Box
       sx={{

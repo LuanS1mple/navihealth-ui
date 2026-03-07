@@ -30,6 +30,7 @@ import {
   GET_CHAT_HISTORY,
 } from '../../../constants/apis';
 import ConversationList from './ConversationList';
+import { trackEvent, GA_EVENTS } from '../../../utils/analytics';
 
 function ChatBot() {
   const [message, setMessage] = useState('');
@@ -112,6 +113,7 @@ function ChatBot() {
     setMessages((prev) => [...prev, userMessage]);
     setMessage('');
     setLoading(true);
+    trackEvent(GA_EVENTS.CHAT_AI);
 
     try {
       const response = await requestApi(CHAT, 'POST', {

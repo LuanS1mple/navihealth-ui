@@ -41,14 +41,20 @@ import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import BackHandIcon from '@mui/icons-material/BackHand';
 import CloseIcon from '@mui/icons-material/Close';
 import { useRef } from 'react';
+import { trackEvent, GA_EVENTS } from '../../../utils/analytics';
 
 import requestApi from '../../../apis/apis'
 import {
   UPLOAD_API,
+  CREATE_VISIT,
+  PREVIEW_AI,
+  CONFIRM_SAVE,
   SAVE_RECORD,
   GET_RECORDS,
   DETAIL_RECORD,
   COMPARE_RECORDS,
+  COMPARE_HISTORY,
+  COMPARE_DETAIL,
   SHARE_RECORD,
   VIEW_SHARED_RECORD,
   MY_SHARE_CODES,
@@ -88,6 +94,16 @@ function HealthRecordList() {
   const [comparisonResult, setComparisonResult] = useState(null);
   const [isComparing, setIsComparing] = useState(false);
   const [showComparisonResult, setShowComparisonResult] = useState(false);
+  const [showComparisonHistory, setShowComparisonHistory] = useState(false);
+  const [comparisonHistory, setComparisonHistory] = useState([]);
+  const [isFetchingHistory, setIsFetchingHistory] = useState(false);
+
+  // Create Visit State
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newVisitData, setNewVisitData] = useState({ recordName: '', hospitalName: '' });
+  const [isCreatingVisit, setIsCreatingVisit] = useState(false);
+
+  const [currentVisitId, setCurrentVisitId] = useState(null);
 
   // Camera State
   const [showCamera, setShowCamera] = useState(false);
@@ -145,54 +161,113 @@ function HealthRecordList() {
     }
   };
 
-  const processImage = async (file) => {
+  const processImage = async (files, visitId) => {
     setUploading(true);
     try {
       const formData = new FormData();
-      formData.append("files", file);
-      const data = await requestApi(UPLOAD_API, "POST", formData, "multipart/form-data");
-      setConfirmData(data);
+      // Gửi nhiều file lên cùng lúc
+      Array.from(files).forEach(file => {
+        formData.append("files", file);
+      });
+
+      const response = await requestApi(`${PREVIEW_AI}${visitId}/preview-ai`, "POST", formData);
+      setConfirmData(response.data);
+      setCurrentVisitId(visitId);
       setShowConfirm(true);
     } catch (e) {
+      console.error(e);
       alert("Lỗi khi tải ảnh hoặc phân tích dữ liệu");
     } finally {
       setUploading(false);
     }
   };
 
+  const handleCreateVisit = async () => {
+    if (!newVisitData.recordName.trim()) {
+      alert("Vui lòng nhập tên bộ hồ sơ");
+      return;
+    }
+    setIsCreatingVisit(true);
+    try {
+      const response = await requestApi(CREATE_VISIT, 'POST', newVisitData);
+      if (response.status === 200) {
+        alert("Tạo bộ hồ sơ rỗng thành công. Bây giờ bạn có thể thêm ảnh vào bộ này.");
+        setShowCreateModal(false);
+        setNewVisitData({ recordName: '', hospitalName: '' });
+        fetchRecords();
+      }
+    } catch (error) {
+      console.error(error);
+      alert(error.response?.data?.message || "Lỗi khi tạo bộ hồ sơ");
+    } finally {
+      setIsCreatingVisit(false);
+    }
+  };
+
+  const handleAddRecords = async (visitId) => {
+    try {
+      const uploadedFiles = await getImages();
+      if (!uploadedFiles || uploadedFiles.length === 0) return;
+      await processImage(uploadedFiles, visitId);
+    } catch (e) {
+      if (e !== "Không có file") console.error(e);
+    }
+  };
+
+  const handleAddRecordsCamera = (visitId) => {
+    setCurrentVisitId(visitId);
+    startCamera();
+  };
+
   const handleUpload = async () => {
     try {
-      const uploadedImage = await getImage();
-      if (!uploadedImage) return;
-      await processImage(uploadedImage);
+      const uploadedFiles = await getImages();
+      if (!uploadedFiles || uploadedFiles.length === 0) return;
+
+      setUploading(true);
+      const visitName = `Khám bênh - ${new Date().toLocaleDateString('vi-VN')}`;
+      const response = await requestApi(CREATE_VISIT, 'POST', {
+        recordName: visitName,
+        hospitalName: "Đang cập nhật..."
+      });
+      const visitId = response.data.visit_id;
+      await processImage(uploadedFiles, visitId);
     } catch (e) {
       if (e !== "Không có file") {
-        alert("Lỗi khi chọn ảnh");
+        console.error(e);
+        alert(e.response?.data?.message || "Lỗi khi xử lý hồ sơ");
       }
+    } finally {
+      setUploading(false);
     }
   };
 
   const handleConfirmSave = async () => {
     try {
-      await requestApi(SAVE_RECORD, "POST", confirmData.data);
+      // Sử dụng API confirm-save mới của Backend
+      await requestApi(`${CONFIRM_SAVE}${currentVisitId}/confirm-save`, "POST", confirmData);
+      trackEvent(GA_EVENTS.UPLOAD_RECORD);
       setShowConfirm(false);
       setConfirmData(null);
+      setCurrentVisitId(null);
       alert("Lưu hồ sơ thành công");
       fetchRecords();
     } catch (e) {
       console.error(e);
+      alert("Lỗi khi lưu hồ sơ");
     }
   };
 
-  const getImage = () => {
+  const getImages = () => {
     return new Promise((resolve, reject) => {
       const input = document.createElement("input");
       input.type = "file";
       input.accept = "image/*";
+      input.multiple = true; // Cho phép chọn nhiều ảnh
       input.onchange = () => {
-        const file = input.files[0];
-        if (!file) return reject("Không có file");
-        resolve(file);
+        const files = input.files;
+        if (!files || files.length === 0) return reject("Không có file");
+        resolve(files);
       };
       input.click();
     });
@@ -243,7 +318,26 @@ function HealthRecordList() {
       if (blob) {
         const file = new File([blob], `capture_${Date.now()}.jpg`, { type: 'image/jpeg' });
         stopCamera();
-        await processImage(file);
+
+        // Nếu đã có visitId từ trước (thêm vào bộ hồ sơ con)
+        if (currentVisitId) {
+          await processImage([file], currentVisitId);
+        } else {
+          // Luồng tạo nhanh
+          setUploading(true);
+          try {
+            const visitName = `Khám nhanh - ${new Date().toLocaleTimeString('vi-VN')}`;
+            const response = await requestApi(CREATE_VISIT, 'POST', {
+              recordName: visitName,
+              hospitalName: "Khám trực tiếp"
+            });
+            await processImage([file], response.data.visit_id);
+          } catch (error) {
+            alert("Lỗi khi khởi tạo bộ hồ sơ");
+          } finally {
+            setUploading(false);
+          }
+        }
       }
     }, 'image/jpeg', 0.9);
   };
@@ -274,6 +368,12 @@ function HealthRecordList() {
       });
 
       if (response.status === 200) {
+        const r1 = records.find(r => (r.id || r._id) === selectedRecords[0]);
+        const r2 = records.find(r => (r.id || r._id) === selectedRecords[1]);
+        setComparingNames({
+          r1: r1?.recordName || 'Hồ sơ 1',
+          r2: r2?.recordName || 'Hồ sơ 2'
+        });
         setComparisonResult(response.data);
         setShowComparisonResult(true);
       }
@@ -289,6 +389,48 @@ function HealthRecordList() {
     setIsComparisonMode(false);
     setSelectedRecords([]);
     setComparisonResult(null);
+  };
+
+  const fetchComparisonHistory = async () => {
+    setIsFetchingHistory(true);
+    try {
+      const response = await requestApi(COMPARE_HISTORY, 'GET');
+      if (response.status === 200) {
+        setComparisonHistory(response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching comparison history:", error);
+    } finally {
+      setIsFetchingHistory(false);
+    }
+  };
+
+  const [comparingNames, setComparingNames] = useState({ r1: '', r2: '' });
+
+  const handleViewComparisonDetail = async (id, r1Name, r2Name) => {
+    try {
+      const response = await requestApi(`${COMPARE_DETAIL}${id}`, 'GET');
+      if (response.status === 200) {
+        setComparisonResult(response.data);
+        setComparingNames({ r1: r1Name, r2: r2Name });
+        setShowComparisonHistory(false); // Đóng modal lịch sử
+        setTimeout(() => {
+          setShowComparisonResult(true);
+        }, 100);
+      }
+    } catch (error) {
+      alert("Không thể tải chi tiết bản so sánh");
+    }
+  };
+
+  const handleDeleteComparison = async (id) => {
+    if (!window.confirm("Bạn có chắc chắn muốn xóa lịch sử so sánh này?")) return;
+    try {
+      await requestApi(`${COMPARE_DETAIL}${id}`, 'DELETE');
+      fetchComparisonHistory();
+    } catch (error) {
+      alert("Xóa thất bại");
+    }
   };
 
   // Share Handlers
@@ -402,18 +544,14 @@ function HealthRecordList() {
               <Box sx={{ display: 'flex', gap: 2 }}>
                 <Button
                   variant="contained"
-                  startIcon={<CameraAltIcon />}
-                  onClick={handleUpload}
+                  startIcon={<FileKey size={18} />}
+                  onClick={() => setShowCreateModal(true)}
+                  sx={{
+                    background: 'linear-gradient(135deg, #519db1 0%, #004aad 100%)',
+                    boxShadow: '0 4px 15px rgba(0, 74, 173, 0.2)'
+                  }}
                 >
-                  Tải ảnh lên
-                </Button>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  startIcon={<PhotoCameraIcon />}
-                  onClick={startCamera}
-                >
-                  Chụp ảnh trực tiếp
+                  Tạo bộ hồ sơ mới
                 </Button>
                 <Button
                   variant={isComparisonMode ? "contained" : "text"}
@@ -448,6 +586,17 @@ function HealthRecordList() {
                   }}
                 >
                   Quản lý mã đã chia sẻ
+                </Button>
+                <Button
+                  variant="text"
+                  color="warning"
+                  startIcon={<Calendar size={18} />}
+                  onClick={() => {
+                    fetchComparisonHistory();
+                    setShowComparisonHistory(true);
+                  }}
+                >
+                  Lịch sử so sánh
                 </Button>
                 {isComparisonMode && (
                   <>
@@ -506,6 +655,8 @@ function HealthRecordList() {
                 onView={handleView}
                 onDelete={handleDelete}
                 onShare={handleOpenShare}
+                onAddRecords={handleAddRecords}
+                onAddCamera={handleAddRecordsCamera}
                 selectable={isComparisonMode}
                 selected={selectedRecords.includes(record.id || record._id)}
                 onSelect={handleSelectRecord}
@@ -550,7 +701,7 @@ function HealthRecordList() {
               <>
                 <Box sx={{ overflowY: 'auto', p: 3, flex: 1 }}>
                   <Typography variant="h5" sx={{ mb: 2, fontWeight: 700 }}>Xác nhận thông tin</Typography>
-                  <ConfirmRecord data={confirmData.data} message="Xác nhận thông tin" />
+                  <ConfirmRecord data={confirmData} message="Xác nhận thông tin" />
                 </Box>
                 <Box sx={{ p: 2, borderTop: '1px solid #f1f5f9', display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
                   <Button variant="text" onClick={() => setShowConfirm(false)}>Hủy</Button>
@@ -572,7 +723,12 @@ function HealthRecordList() {
             {viewData && (
               <>
                 <Box sx={{ overflowY: 'auto', p: 3, flex: 1 }}>
-                  <ConfirmRecord data={viewData} message="Chi tiết hồ sơ" />
+                  <ConfirmRecord
+                    data={viewData}
+                    message="Chi tiết hồ sơ"
+                    onAddRecords={handleAddRecords}
+                    onAddCamera={handleAddRecordsCamera}
+                  />
                 </Box>
                 <Box sx={{ p: 2, borderTop: '1px solid #f1f5f9', display: 'flex', justifyContent: 'flex-end' }}>
                   <Button variant="outlined" onClick={() => setShowView(false)}>Đóng</Button>
@@ -651,6 +807,40 @@ function HealthRecordList() {
             <Box sx={{ overflowY: 'auto', p: 4, flex: 1 }}>
               {comparisonResult && (
                 <Box>
+                  {(comparingNames.r1 || comparingNames.r2) && (
+                    <Typography variant="h6" sx={{ mb: 3, fontWeight: 700, color: '#004aad', textAlign: 'center' }}>
+                      {comparingNames.r1} <span style={{ color: '#94a3b8', fontWeight: 400 }}>so với</span> {comparingNames.r2}
+                    </Typography>
+                  )}
+
+                  {/* Hiển thị tóm tắt 2 bộ hồ sơ */}
+                  {(comparisonResult.Record1 || comparisonResult.record1 || comparisonResult.Record2 || comparisonResult.record2) && (
+                    <Grid container spacing={2} sx={{ mb: 3 }}>
+                      <Grid item xs={6}>
+                        <Paper variant="outlined" sx={{ p: 2, borderRadius: '16px', bgcolor: '#f8fafc' }}>
+                          <Typography variant="caption" sx={{ fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Hồ sơ gốc</Typography>
+                          <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#0f172a' }}>
+                            {(comparisonResult.Record1 || comparisonResult.record1)?.recordName || (comparisonResult.Record1 || comparisonResult.record1)?.RecordName || 'Hồ sơ 1'}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {(comparisonResult.Record1 || comparisonResult.record1)?.hospitalName || (comparisonResult.Record1 || comparisonResult.record1)?.HospitalName || 'Không rõ bệnh viện'}
+                          </Typography>
+                        </Paper>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Paper variant="outlined" sx={{ p: 2, borderRadius: '16px', bgcolor: '#f8fafc' }}>
+                          <Typography variant="caption" sx={{ fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Hồ sơ so sánh</Typography>
+                          <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#0f172a' }}>
+                            {(comparisonResult.Record2 || comparisonResult.record2)?.recordName || (comparisonResult.Record2 || comparisonResult.record2)?.RecordName || 'Hồ sơ 2'}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {(comparisonResult.Record2 || comparisonResult.record2)?.hospitalName || (comparisonResult.Record2 || comparisonResult.record2)?.HospitalName || 'Không rõ bệnh viện'}
+                          </Typography>
+                        </Paper>
+                      </Grid>
+                    </Grid>
+                  )}
+
                   <Typography variant="body1" sx={{
                     lineHeight: 1.8,
                     color: '#334155',
@@ -658,7 +848,7 @@ function HealthRecordList() {
                     fontFamily: 'inherit',
                     '& strong': { color: '#0f172a', fontWeight: 700 }
                   }}>
-                    {comparisonResult.comparisonResult}
+                    {comparisonResult.comparisonResult || comparisonResult.ComparisonResult}
                   </Typography>
 
                   <Box sx={{ mt: 4, p: 3, bgcolor: '#f0f9ff', borderRadius: '16px', border: '1px solid #e0f2fe' }}>
@@ -868,6 +1058,129 @@ function HealthRecordList() {
 
             <Box sx={{ p: 2, borderTop: '1px solid #f1f5f9', display: 'flex', justifyContent: 'flex-end', bgcolor: '#f8fafc' }}>
               <Button onClick={() => setShowManageCodesModal(false)}>Đóng</Button>
+            </Box>
+          </Box>
+        </Fade>
+      </Modal>
+
+      {/* ===== CREATE VISIT MODAL ===== */}
+      <Modal open={showCreateModal} onClose={() => setShowCreateModal(false)}>
+        <Fade in={showCreateModal}>
+          <Box sx={{
+            position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+            width: '90%', maxWidth: 500, bgcolor: 'white',
+            borderRadius: '24px', boxShadow: 24, p: 4
+          }}>
+            <Typography variant="h5" sx={{ mb: 1, fontWeight: 700 }}>Tạo bộ hồ sơ sức khỏe mới</Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              Khởi tạo một bộ hồ sơ trống để quản lý các tờ xét nghiệm sau này.
+            </Typography>
+
+            <Stack spacing={2.5}>
+              <TextField
+                fullWidth
+                label="Tên bộ hồ sơ (Ví dụ: Khám tổng quát 2024)"
+                value={newVisitData.recordName}
+                onChange={(e) => setNewVisitData({ ...newVisitData, recordName: e.target.value })}
+                placeholder="Nhập tên gợi nhớ cho đợt khám này"
+              />
+              <TextField
+                fullWidth
+                label="Tên bệnh viện / Phòng khám"
+                value={newVisitData.hospitalName}
+                onChange={(e) => setNewVisitData({ ...newVisitData, hospitalName: e.target.value })}
+                placeholder="Ví dụ: Bệnh viện Bạch Mai"
+              />
+
+              <Box sx={{ pt: 2, display: 'flex', gap: 2 }}>
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  onClick={() => setShowCreateModal(false)}
+                  sx={{ borderRadius: '12px' }}
+                >
+                  Hủy
+                </Button>
+                <Button
+                  fullWidth
+                  variant="contained"
+                  onClick={handleCreateVisit}
+                  disabled={isCreatingVisit}
+                  startIcon={isCreatingVisit ? <CircularProgress size={20} color="inherit" /> : null}
+                  sx={{ borderRadius: '12px' }}
+                >
+                  {isCreatingVisit ? "Đang tạo..." : "Xác nhận tạo"}
+                </Button>
+              </Box>
+            </Stack>
+          </Box>
+        </Fade>
+      </Modal>
+
+      {/* ===== COMPARISON HISTORY MODAL ===== */}
+      <Modal open={showComparisonHistory} onClose={() => setShowComparisonHistory(false)}>
+        <Fade in={showComparisonHistory}>
+          <Box sx={{
+            position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+            width: '90%', maxWidth: 700, maxHeight: '85vh', bgcolor: 'white',
+            borderRadius: '24px', boxShadow: 24, display: 'flex', flexDirection: 'column', overflow: 'hidden'
+          }}>
+            <Box sx={{ p: 3, borderBottom: '1px solid #f1f5f9', bgcolor: '#f8fafc', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Box>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>Lịch sử so sánh hồ sơ</Typography>
+                <Typography variant="caption" color="text.secondary">Danh sách các lần bạn đã sử dụng AI để so sánh chỉ số</Typography>
+              </Box>
+              <IconButton onClick={() => setShowComparisonHistory(false)} size="small">×</IconButton>
+            </Box>
+
+            <Box sx={{ p: 0, flex: 1, overflowY: 'auto' }}>
+              {isFetchingHistory ? (
+                <Box sx={{ p: 10, textAlign: 'center' }}><CircularProgress size={30} /></Box>
+              ) : comparisonHistory.length === 0 ? (
+                <Box sx={{ p: 10, textAlign: 'center' }}>
+                  <Typography color="text.secondary">Bạn chưa thực hiện bản so sánh nào.</Typography>
+                </Box>
+              ) : (
+                <Stack spacing={0} divider={<Divider />}>
+                  {comparisonHistory.map((item) => (
+                    <Box key={item.id} sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.2s', '&:hover': { bgcolor: '#f1f5f9' } }}>
+                      <Box sx={{ flex: 1 }}>
+                        <Typography sx={{ fontWeight: 700, color: '#0f172a', mb: 0.5 }}>
+                          {item.record_1_name} <span style={{ color: '#94a3b8', fontWeight: 400 }}>vs</span> {item.record_2_name}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontStyle: 'italic' }}>
+                          "{item.summary_preview}"
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: '#519db1', fontWeight: 600 }}>
+                          Ngày so sánh: {new Date(item.compare_date).toLocaleString()}
+                        </Typography>
+                      </Box>
+                      <Stack direction="row" spacing={1} sx={{ ml: 2 }}>
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          startIcon={<Eye size={14} />}
+                          onClick={() => handleViewComparisonDetail(item.id, item.record_1_name, item.record_2_name)}
+                          sx={{ borderRadius: '8px', textTransform: 'none' }}
+                        >
+                          Xem
+                        </Button>
+                        <IconButton
+                          size="small"
+                          color="error"
+                          onClick={() => handleDeleteComparison(item.id)}
+                        >
+                          <Trash2 size={18} />
+                        </IconButton>
+                      </Stack>
+                    </Box>
+                  ))}
+                </Stack>
+              )}
+            </Box>
+
+            <Box sx={{ p: 2, borderTop: '1px solid #f1f5f9', display: 'flex', justifyContent: 'flex-end', bgcolor: '#f8fafc' }}>
+              <Button onClick={() => setShowComparisonHistory(false)} sx={{ fontWeight: 600 }}>Đóng</Button>
             </Box>
           </Box>
         </Fade>

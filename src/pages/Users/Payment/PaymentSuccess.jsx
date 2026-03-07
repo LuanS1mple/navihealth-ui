@@ -13,8 +13,13 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { trackEvent, GA_EVENTS } from '../../../utils/analytics';
 
 const PaymentSuccess = () => {
+  useEffect(() => {
+    trackEvent(GA_EVENTS.PAYMENT, { item_name: 'Premium Plan' });
+  }, []);
+
   const navigate = useNavigate();
   const theme = useTheme();
 

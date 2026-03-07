@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -9,21 +9,44 @@ import {
   Button,
   Snackbar,
   Alert,
-  CircularProgress
+  CircularProgress,
+  IconButton,
+  Divider,
+  Stack
 } from '@mui/material';
-import { Feedback as FeedbackIcon, Send } from '@mui/icons-material';
+import { Feedback as FeedbackIcon, Send, Delete as DeleteIcon } from '@mui/icons-material';
 import requestApi from '../../../apis/apis';
-import { FEEDBACK } from '../../../constants/apis';
+import { FEEDBACK, MY_FEEDBACKS } from '../../../constants/apis';
 
 function Feedback() {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(false);
+  const [myFeedbacks, setMyFeedbacks] = useState([]);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
     severity: 'success'
   });
+
+  const fetchMyFeedbacks = async () => {
+    setFetching(true);
+    try {
+      const response = await requestApi(MY_FEEDBACKS, 'GET');
+      if (response.status === 200) {
+        setMyFeedbacks(response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching feedbacks:', error);
+    } finally {
+      setFetching(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMyFeedbacks();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -51,6 +74,7 @@ function Feedback() {
         });
         setComment('');
         setRating(5);
+        fetchMyFeedbacks(); // Refresh list
       }
     } catch (error) {
       console.error('Error submitting feedback:', error);
@@ -64,117 +88,166 @@ function Feedback() {
     }
   };
 
+  const handleDelete = async (id) => {
+    if (!window.confirm('Bạn có chắc chắn muốn xóa phản hồi này?')) return;
+
+    try {
+      const response = await requestApi(`${FEEDBACK}/${id}`, 'DELETE');
+      if (response.status === 200) {
+        setSnackbar({
+          open: true,
+          message: 'Đã xóa phản hồi.',
+          severity: 'success'
+        });
+        setMyFeedbacks(prev => prev.filter(f => (f.id || f._id) !== id));
+      }
+    } catch (error) {
+      console.error('Error deleting feedback:', error);
+    }
+  };
+
   const handleCloseSnackbar = () => {
     setSnackbar({ ...snackbar, open: false });
   };
 
   return (
-    <Box sx={{ maxWidth: 800, mx: 'auto', mt: 4, px: 2 }}>
+    <Box sx={{ maxWidth: 900, mx: 'auto', mt: 4, px: 2, pb: 8 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 3, gap: 2 }}>
         <FeedbackIcon sx={{ color: '#004aad', fontSize: 32 }} />
         <Typography variant="h5" sx={{ color: '#004aad', fontWeight: 600 }}>
-          Gửi Phản Hồi
+          Ý Kiến Phản Hồi
         </Typography>
       </Box>
 
-      <Typography sx={{ color: '#64748b', mb: 4 }}>
-        Ý kiến của bạn giúp chúng tôi cải thiện NaviHealth tốt hơn mỗi ngày.
-        Hãy chia sẻ trải nghiệm của bạn với chúng tôi nhé!
-      </Typography>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 4 }}>
+        {/* FORM GỬI FEEDBACK */}
+        <Box>
+          <Typography sx={{ color: '#64748b', mb: 3 }}>
+            Hãy chia sẻ trải nghiệm của bạn để giúp NaviHealth hoàn thiện hơn mỗi ngày.
+          </Typography>
 
-      <Card sx={{
-        borderRadius: '20px',
-        boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)',
-        overflow: 'visible'
-      }}>
-        <CardContent sx={{ p: { xs: 3, md: 5 } }}>
-          <form onSubmit={handleSubmit}>
-            <Box sx={{ mb: 4, textAlign: 'center' }}>
-              <Typography sx={{ fontWeight: 600, mb: 2, color: '#1e293b' }}>
-                Đánh giá của bạn về ứng dụng?
-              </Typography>
-              <Rating
-                name="feedback-rating"
-                value={rating}
-                onChange={(event, newValue) => {
-                  setRating(newValue);
-                }}
-                size="large"
-                sx={{
-                  fontSize: '3rem',
-                  color: '#fbbf24',
-                  '& .MuiRating-iconEmpty': {
-                    color: '#e2e8f0'
-                  }
-                }}
-              />
-            </Box>
+          <Card sx={{
+            borderRadius: '20px',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+          }}>
+            <CardContent sx={{ p: 3 }}>
+              <form onSubmit={handleSubmit}>
+                <Box sx={{ mb: 3, textAlign: 'center' }}>
+                  <Typography sx={{ fontWeight: 600, mb: 1, color: '#1e293b' }}>
+                    Đánh giá của bạn?
+                  </Typography>
+                  <Rating
+                    value={rating}
+                    onChange={(e, v) => setRating(v)}
+                    size="large"
+                    sx={{ color: '#fbbf24' }}
+                  />
+                </Box>
 
-            <Box sx={{ mb: 4 }}>
-              <Typography sx={{ fontWeight: 600, mb: 1.5, color: '#1e293b' }}>
-                Nội dung góp ý
-              </Typography>
-              <TextField
-                fullWidth
-                multiline
-                rows={5}
-                placeholder="Hãy chia sẻ điều bạn hài lòng hoặc điều chúng tôi cần cải thiện..."
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                variant="outlined"
-                sx={{
-                  '& .MuiOutlinedInput-root': {
+                <Box sx={{ mb: 3 }}>
+                  <Typography sx={{ fontWeight: 600, mb: 1, color: '#1e293b' }}>
+                    Nội dung góp ý
+                  </Typography>
+                  <TextField
+                    fullWidth
+                    multiline
+                    rows={4}
+                    placeholder="Điều gì làm bạn hài lòng hoặc chưa hài lòng?"
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: '12px',
+                        backgroundColor: '#f8fafc',
+                      }
+                    }}
+                  />
+                </Box>
+
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  disabled={loading}
+                  endIcon={loading ? <CircularProgress size={20} color="inherit" /> : <Send />}
+                  sx={{
+                    py: 1.5,
                     borderRadius: '12px',
-                    backgroundColor: '#f8fafc',
-                    '&:hover fieldset': {
-                      borderColor: '#004aad',
-                    },
-                    '&.Mui-focused fieldset': {
-                      borderColor: '#004aad',
-                    }
-                  }
-                }}
-              />
-            </Box>
+                    backgroundColor: '#004aad',
+                    fontWeight: 600,
+                    textTransform: 'none',
+                    '&:hover': { backgroundColor: '#003d8f' }
+                  }}
+                >
+                  {loading ? 'đang gửi...' : 'Gửi phản hồi'}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        </Box>
 
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              disabled={loading}
-              endIcon={loading ? <CircularProgress size={20} color="inherit" /> : <Send />}
-              sx={{
-                py: 1.5,
-                borderRadius: '12px',
-                backgroundColor: '#004aad',
-                fontSize: '16px',
-                fontWeight: 600,
-                textTransform: 'none',
-                boxShadow: '0 4px 6px -1px rgba(0, 74, 173, 0.3)',
-                '&:hover': {
-                  backgroundColor: '#003d8f',
-                  boxShadow: '0 10px 15px -3px rgba(0, 74, 173, 0.4)',
-                }
-              }}
-            >
-              {loading ? 'đang gửi...' : 'Gửi phản hồi'}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+        {/* DANH SÁCH FEEDBACK ĐÃ GỬI */}
+        <Box>
+          <Typography variant="h6" sx={{ fontWeight: 600, color: '#334155', mb: 3 }}>
+            Phản hồi của tôi
+          </Typography>
+
+          {fetching ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+              <CircularProgress size={30} sx={{ color: '#004aad' }} />
+            </Box>
+          ) : myFeedbacks.length === 0 ? (
+            <Box sx={{
+              p: 4, textAlign: 'center', backgroundColor: '#f8fafc',
+              borderRadius: '16px', border: '1px dashed #cbd5e1'
+            }}>
+              <Typography sx={{ color: '#94a3b8' }}>Bạn chưa gửi phản hồi nào.</Typography>
+            </Box>
+          ) : (
+            <Stack spacing={2}>
+              {myFeedbacks.map((fb) => {
+                const id = fb.id || fb._id;
+                const ratingValue = fb.rating || fb.Rating || 0;
+                const commentText = fb.comment || fb.Comment || "";
+                const dateStr = fb.createdAt || fb.CreatedAt;
+
+                return (
+                  <Card key={id} sx={{ borderRadius: '16px', border: '1px solid #f1f5f9', position: 'relative' }}>
+                    <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <Rating value={ratingValue} readOnly size="small" sx={{ color: '#fbbf24' }} />
+                        <IconButton
+                          size="small"
+                          onClick={() => handleDelete(id)}
+                          sx={{ color: '#ef4444', p: 0.5 }}
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </Box>
+                      <Typography variant="body2" sx={{ mt: 1, color: '#334155', whiteSpace: 'pre-line' }}>
+                        {commentText}
+                      </Typography>
+                      {dateStr && (
+                        <Typography variant="caption" sx={{ mt: 1.5, display: 'block', color: '#94a3b8' }}>
+                          {new Date(dateStr).toLocaleDateString('vi-VN')} {new Date(dateStr).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+                        </Typography>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </Stack>
+          )}
+        </Box>
+      </Box>
 
       <Snackbar
         open={snackbar.open}
-        autoHideDuration={6000}
+        autoHideDuration={4000}
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity={snackbar.severity}
-          variant="filled"
-          sx={{ width: '100%', borderRadius: '10px' }}
-        >
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ borderRadius: '10px' }}>
           {snackbar.message}
         </Alert>
       </Snackbar>
